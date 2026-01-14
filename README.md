@@ -1,4 +1,4 @@
-![Gentle Reminders](https://i.imgur.com/7Gk5WGY.png)  
+![Gentle Reminders](https://cdn.modrinth.com/data/cached_images/a7519c342a4ca161c71895db02871cce8b1a71d3.png) 
 
 **Gentle Reminders** is a mod that sends mindful messages to the player every so often based on a customizable config file.  
 Available for download on [Curseforge](https://www.curseforge.com/minecraft/mc-mods/gentlereminders) and [Modrinth](https://modrinth.com/mod/gentlereminders). Thank you for over 1800 downloads!   
@@ -50,32 +50,32 @@ Gentle Reminders supports multiple Minecraft versions and mod loaders:
 
 ## Message Examples  
   
-**Simple Message 1**
-![Simple Message 1](https://i.imgur.com/sKQtWIa.png)  
+**Simple Message (Default Style)**  
+![Simple Message](https://cdn.modrinth.com/data/cached_images/473297570d9409eb176a4d69961a146149b6260b.png)
   
-**Simple Message 2**
-![Simple Message 2](https://i.imgur.com/0MAaaIN.png)  
+**Unique Message (Dark Style)**  
+![Unique Message (Dark Style)](https://cdn.modrinth.com/data/cached_images/d5721528ded9c597376f8e592f20a822c34297c3.png)
   
-**Unique Message 1**
-![Unique Message 1](https://i.imgur.com/qx95uVV.png)
+**Unique Message (Light Style)**  
+![Unique Message (Light Style)](https://cdn.modrinth.com/data/cached_images/79273fd7c8524e2b18c6a596b1eb7a16cc16cfaf.png)
 
-**Unique Message 2**
-![Unique Message 2](https://i.imgur.com/sSVDy18.png)
+**Unique Message (Chat Style)**  
+![Unique Message (Chat Style)](https://cdn.modrinth.com/data/cached_images/58730239e5f7a6b0f10ade0f102489e46f5b81c0.png)
 
-**Custom Dark Oak Planks Background and Amethyst Block Border**
-![Custom Message 1](https://i.imgur.com/6zmVxEp.png)
+**Custom Dark Oak Planks Background and Amethyst Block Border**  
+![Custom Dark Oak Planks Background and Amethyst Block Border](https://cdn.modrinth.com/data/cached_images/1b58ca2c813abfd20bfbdcf0fac9f52211d40cf9.png)
 
-**Custom Blackstone Background and Resin Brick Border**
-![Custom Message 2](https://i.imgur.com/T47B1gM.png)
+**Custom Blackstone Background and Resin Brick Border**  
+![Custom Blackstone Background and Resin Brick Border](https://cdn.modrinth.com/data/cached_images/16c95e72a96488d011489fbeabc3ac3b3b924b40.png)
 
-**Custom Redstone Block Background and Diorite Border**
-![Custom Message 3](https://i.imgur.com/nBFllTg.png)
+**Custom Redstone Block Background and Diorite Border**  
+![Custom Redstone Block Background and Diorite Border](https://cdn.modrinth.com/data/cached_images/9a8fa795777889136283c0fc9b72191e79a16dd8.png)
 
-**Custom Slime Block Background and Sand Border**
-![Custom Message 4](https://i.imgur.com/fkixEBu.png)
+**Custom Slime Block Background and Sand Border**  
+![Custom Slime Block Background and Sand Border](https://cdn.modrinth.com/data/cached_images/7f220fd89741ce8f540d1788b1165a3175325401.png)
 
-**How it shows up in-game**
-![In-Game Example](https://i.imgur.com/5GP3yGw.png)
+**How it shows up in-game**  
+![In-Game Example](https://cdn.modrinth.com/data/cached_images/9f8bd910089b1caa8a31149cf4bef4a6bc450de2.jpeg)
   
 ## Config Guide  
   
