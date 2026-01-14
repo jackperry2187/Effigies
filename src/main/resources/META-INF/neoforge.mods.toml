@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/jackperry2187/GentleReminders/issues"
+
+[[mods]]
+modId = "gentlereminders"
+version = "${version}"
+displayName = "Gentle Reminders"
+authors = "JackPerry2187"
+description = '''
+A Minecraft mod that sends gentle, mindful reminders to players during their gameplay sessions.
+'''
+logoFile = "assets/gentlereminders/icon.png"
+
+[[dependencies.gentlereminders]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.gentlereminders]]
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraft_version},)"
+ordering = "NONE"
+side = "BOTH"

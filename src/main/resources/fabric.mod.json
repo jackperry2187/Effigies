@@ -1,0 +1,33 @@
+{
+    "schemaVersion": 1,
+    "id": "gentlereminders",
+    "version": "${version}",
+    "name": "Gentle Reminders",
+    "description": "A Minecraft mod that sends gentle, mindful reminders to players during their gameplay sessions.",
+    "authors": [
+        "JackPerry2187"
+    ],
+    "contact": {
+        "sources": "https://github.com/jackperry2187/GentleReminders",
+        "issues": "https://github.com/jackperry2187/GentleReminders/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/gentlereminders/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "jackperry2187.gentlereminders.fabric.GentleRemindersFabric"
+        ],
+        "client": [
+            "jackperry2187.gentlereminders.fabric.GentleRemindersClientFabric"
+        ]
+    },
+    "mixins": [],
+    "depends": {
+        "fabricloader": ">=0.16.0",
+        "minecraft": "${minecraft_version}",
+        "java": ">=${java_version}",
+        "fabric-api": "*"
+    },
+    "suggests": {}
+}
