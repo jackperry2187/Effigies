@@ -2,7 +2,7 @@
 
 ## Version Support
 
-Gentle Reminders supports multiple Minecraft versions and mod loaders:
+Effigies supports multiple Minecraft versions and mod loaders:
 
 | Loader | Minecraft Versions |
 |--------|-------------------|

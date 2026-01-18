@@ -28,6 +28,7 @@ versions/*/build/processIncludeJars/
 versions/*/build/resources/
 
 # IDE files
+.cursor/
 .idea/
 *.iml
 *.ipr
