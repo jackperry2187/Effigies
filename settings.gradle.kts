@@ -19,9 +19,9 @@ stonecutter {
     kotlinController = true
     
     create(rootProject) {
-        versions("1.20.1-fabric", "1.21.1-fabric", "1.21.1-neoforge", "1.21.6-fabric", "1.21.6-neoforge")
-        vcsVersion = "1.21.6-fabric"
+        versions("1.21.11-fabric", "1.21.11-neoforge")
+        vcsVersion = "1.21.11-fabric"
     }
 }
 
-rootProject.name = "gentlereminders"
+rootProject.name = "effigies"

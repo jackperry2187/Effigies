@@ -2,7 +2,14 @@ plugins {
     id("dev.kikugie.stonecutter")
 }
 
-stonecutter active "1.21.6-fabric" /* [SC] DO NOT EDIT */
+stonecutter active "1.21.11-fabric" /* [SC] DO NOT EDIT */
+
+// Configure Stonecutter parameters for conditional processing
+stonecutter.parameters {
+    val loader = stonecutter.current.version.substringAfter("-")
+    consts["fabric"] = loader == "fabric"
+    consts["neoforge"] = loader == "neoforge"
+}
 
 stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
     group = "project"

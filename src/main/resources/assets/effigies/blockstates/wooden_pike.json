@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "activated=false": { "model": "effigies:block/pike_wooden" },
+    "activated=true": { "model": "effigies:block/pike_wooden" }
+  }
+}

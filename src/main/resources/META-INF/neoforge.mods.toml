@@ -1,26 +1,26 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
 license = "MIT"
-issueTrackerURL = "https://github.com/jackperry2187/GentleReminders/issues"
+issueTrackerURL = "https://github.com/jackperry2187/Effigies/issues"
 
 [[mods]]
-modId = "gentlereminders"
+modId = "effigies"
 version = "${version}"
-displayName = "Gentle Reminders"
+displayName = "Effigies"
 authors = "JackPerry2187"
 description = '''
-A Minecraft mod that sends gentle, mindful reminders to players during their gameplay sessions.
+A Minecraft mod that adds powerful mob spawning prevention options to the game.
 '''
-logoFile = "assets/gentlereminders/icon.png"
+logoFile = "assets/effigies/icon.png"
 
-[[dependencies.gentlereminders]]
+[[dependencies.effigies]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[21.11,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.gentlereminders]]
+[[dependencies.effigies]]
 modId = "minecraft"
 type = "required"
 versionRange = "[${minecraft_version},)"

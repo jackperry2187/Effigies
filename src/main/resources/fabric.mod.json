@@ -1,30 +1,30 @@
 {
     "schemaVersion": 1,
-    "id": "gentlereminders",
+    "id": "effigies",
     "version": "${version}",
-    "name": "Gentle Reminders",
-    "description": "A Minecraft mod that sends gentle, mindful reminders to players during their gameplay sessions.",
+    "name": "Effigies",
+    "description": "A Minecraft mod that adds powerful mob spawning prevention options to the game.",
     "authors": [
         "JackPerry2187"
     ],
     "contact": {
-        "sources": "https://github.com/jackperry2187/GentleReminders",
-        "issues": "https://github.com/jackperry2187/GentleReminders/issues"
+        "sources": "https://github.com/jackperry2187/Effigies",
+        "issues": "https://github.com/jackperry2187/Effigies/issues"
     },
     "license": "MIT",
-    "icon": "assets/gentlereminders/icon.png",
+    "icon": "assets/effigies/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "jackperry2187.gentlereminders.fabric.GentleRemindersFabric"
+            "jackperry2187.effigies.fabric.EffigiesFabric"
         ],
         "client": [
-            "jackperry2187.gentlereminders.fabric.GentleRemindersClientFabric"
+            "jackperry2187.effigies.fabric.EffigiesClientFabric"
         ]
     },
     "mixins": [],
     "depends": {
-        "fabricloader": ">=0.16.0",
+        "fabricloader": ">=0.18.4",
         "minecraft": "${minecraft_version}",
         "java": ">=${java_version}",
         "fabric-api": "*"

@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "activated=false": { "model": "effigies:block/pike_stone" },
+    "activated=true": { "model": "effigies:block/pike_stone" }
+  }
+}
