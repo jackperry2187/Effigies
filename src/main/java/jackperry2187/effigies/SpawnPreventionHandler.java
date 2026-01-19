@@ -84,13 +84,14 @@ public final class SpawnPreventionHandler {
                 int chunkX = spawnChunkX + dx;
                 int chunkZ = spawnChunkZ + dz;
                 for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
-                    if (!(blockEntity instanceof PikeBlockEntity pike) || !pike.hasHead()) {
-                        continue;
-                    }
-                    if (pike.getHeadType() != entityType) {
+                    if (!(blockEntity instanceof PikeBlockEntity pike)) {
                         continue;
                     }
                     BlockPos pikePos = pike.getPos();
+                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(level.getBlockState(pikePos.up()));
+                    if (headType != entityType) {
+                        continue;
+                    }
                     int pikeChunkX = pikePos.getX() >> 4;
                     int pikeChunkZ = pikePos.getZ() >> 4;
                     PikeTier tier = getTierFromBlock(pike.getCachedState().getBlock());
@@ -138,13 +139,14 @@ public final class SpawnPreventionHandler {
                 int chunkX = spawnChunkX + dx;
                 int chunkZ = spawnChunkZ + dz;
                 for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
-                    if (!(blockEntity instanceof PikeBlockEntity pike) || !pike.hasHead()) {
-                        continue;
-                    }
-                    if (pike.getHeadType() != entityType) {
+                    if (!(blockEntity instanceof PikeBlockEntity pike)) {
                         continue;
                     }
                     BlockPos pikePos = pike.getBlockPos();
+                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(level.getBlockState(pikePos.above()));
+                    if (headType != entityType) {
+                        continue;
+                    }
                     int pikeChunkX = pikePos.getX() >> 4;
                     int pikeChunkZ = pikePos.getZ() >> 4;
                     PikeTier tier = getTierFromBlock(pike.getBlockState().getBlock());
