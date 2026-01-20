@@ -9,12 +9,10 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 //?} else {
-/*import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.Block;
-import java.util.function.Supplier;
+/*import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.DeferredHolder;
 *///?}
 
 public final class ModBlocks {
@@ -41,13 +39,13 @@ public final class ModBlocks {
         return STONE_PIKE;
     }
     //?} else {
-    /*public static final DeferredRegister<Block> BLOCKS =
-        DeferredRegister.create(Registries.BLOCK, Effigies.MOD_ID);
+    /*public static final DeferredRegister.Blocks BLOCKS =
+        DeferredRegister.createBlocks(Effigies.MOD_ID);
 
-    public static final DeferredHolder<Block, Block> WOODEN_PIKE =
-        BLOCKS.register("wooden_pike", () -> new PikeBlock(PikeTier.WOODEN));
-    public static final DeferredHolder<Block, Block> STONE_PIKE =
-        BLOCKS.register("stone_pike", () -> new PikeBlock(PikeTier.STONE));
+    public static final DeferredBlock<PikeBlock> WOODEN_PIKE =
+        BLOCKS.register("wooden_pike", () -> new PikeBlock(PikeTier.WOODEN, PikeTier.WOODEN.blockProperties(Effigies.MOD_ID, "wooden_pike")));
+    public static final DeferredBlock<PikeBlock> STONE_PIKE =
+        BLOCKS.register("stone_pike", () -> new PikeBlock(PikeTier.STONE, PikeTier.STONE.blockProperties(Effigies.MOD_ID, "stone_pike")));
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);

@@ -7,7 +7,10 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 //?} else {
-/*import net.minecraft.world.level.block.SoundType;
+/*import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 *///?}
 
@@ -71,8 +74,9 @@ public enum PikeTier {
             .nonOpaque();
     }
     //?} else {
-    /*public BlockBehaviour.Properties blockProperties() {
+    /*public BlockBehaviour.Properties blockProperties(String modId, String blockName) {
         return BlockBehaviour.Properties.of()
+            .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(modId, blockName)))
             .strength(hardness, resistance)
             .sound(soundType)
             .noOcclusion();

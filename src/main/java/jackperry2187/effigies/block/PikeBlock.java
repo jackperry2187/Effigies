@@ -62,6 +62,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -99,8 +100,8 @@ public class PikeBlock extends Block
         setDefaultState(getStateManager().getDefaultState().with(ACTIVATED, false));
     }
     //?} else {
-    /*public PikeBlock(PikeTier tier) {
-        super(tier.blockProperties());
+    /*public PikeBlock(PikeTier tier, BlockBehaviour.Properties props) {
+        super(props);
         this.tier = tier;
         registerDefaultState(stateDefinition.any().setValue(ACTIVATED, false));
     }
@@ -137,8 +138,9 @@ public class PikeBlock extends Block
         }
         if (!world.isClient()) {
             EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-            world.breakBlock(headPos, true);
+            // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
             world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
+            world.breakBlock(headPos, true);
             // Send deactivation message
             sendDeactivationMessage(player, headType);
         }
@@ -162,8 +164,9 @@ public class PikeBlock extends Block
             if (PikeBlockEntity.isValidHeadBlock(headState)) {
                 if (!world.isClient()) {
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                    world.breakBlock(headPos, true);
+                    // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
                     world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
+                    world.breakBlock(headPos, true);
                     // Send deactivation message
                     sendDeactivationMessage(player, headType);
                 }
@@ -194,8 +197,7 @@ public class PikeBlock extends Block
             if (!player.getAbilities().creativeMode) {
                 stack.decrement(1);
             }
-            // Send feedback message to the player
-            sendActivationMessage(player, headType);
+            // Note: Activation message is sent via updateActivatedState triggered by neighbor update
         }
         return ActionResult.SUCCESS;
     }
@@ -241,12 +243,8 @@ public class PikeBlock extends Block
         BlockState neighborState,
         Random random
     ) {
-        if (direction == Direction.UP) {
-            boolean active = PikeBlockEntity.isValidHeadBlock(neighborState);
-            if (state.get(ACTIVATED) != active) {
-                return state.with(ACTIVATED, active);
-            }
-        }
+        // Note: State updates are handled by neighborUpdate -> updateActivatedState
+        // to ensure messages are sent properly. Don't update state here.
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
@@ -281,8 +279,9 @@ public class PikeBlock extends Block
         }
         if (!level.isClientSide()) {
             EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-            level.destroyBlock(headPos, true);
+            // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
             level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
+            level.destroyBlock(headPos, true);
             // Send deactivation message
             sendDeactivationMessage(player, headType);
         }
@@ -306,8 +305,9 @@ public class PikeBlock extends Block
             if (PikeBlockEntity.isValidHeadBlock(headState)) {
                 if (!level.isClientSide()) {
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                    level.destroyBlock(headPos, true);
+                    // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
                     level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
+                    level.destroyBlock(headPos, true);
                     // Send deactivation message
                     sendDeactivationMessage(player, headType);
                 }
@@ -330,7 +330,6 @@ public class PikeBlock extends Block
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!level.isClientSide()) {
-            // Set rotation to face the player
             // Set rotation to face the player (skull looks back at the player who placed it)
             int rotation = Mth.floor((double) (player.getYRot() * 16.0F / 360.0F) + 0.5D) & 15;
             headState = headState.setValue(SkullBlock.ROTATION, rotation);
@@ -339,8 +338,7 @@ public class PikeBlock extends Block
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
-            // Send feedback message to the player
-            sendActivationMessage(player, headType);
+            // Note: Activation message is sent via updateActivatedState triggered by neighbor update
         }
         return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
     }
@@ -388,12 +386,8 @@ public class PikeBlock extends Block
         BlockState neighborState,
         RandomSource random
     ) {
-        if (direction == Direction.UP) {
-            boolean active = PikeBlockEntity.isValidHeadBlock(neighborState);
-            if (state.getValue(ACTIVATED) != active) {
-                return state.setValue(ACTIVATED, active);
-            }
-        }
+        // Note: State updates are handled by neighborChanged -> updateActivatedState
+        // to ensure messages are sent properly. Don't update state here.
         return super.updateShape(state, levelReader, tickAccess, pos, direction, neighborPos, neighborState, random);
     }
 
@@ -413,19 +407,29 @@ public class PikeBlock extends Block
     private void updateActivatedState(World world, BlockPos pos, BlockState state) {
         BlockState headState = world.getBlockState(pos.up());
         boolean active = PikeBlockEntity.isValidHeadBlock(headState);
-        boolean wasActive = state.get(ACTIVATED);
+        // Use the actual world state to check wasActive, not the parameter
+        // This prevents duplicate messages when direct handlers already updated the state
+        BlockState currentWorldState = world.getBlockState(pos);
+        boolean wasActive = currentWorldState.get(ACTIVATED);
         if (wasActive != active) {
-            world.setBlockState(pos, state.with(ACTIVATED, active), Block.NOTIFY_ALL);
+            world.setBlockState(pos, currentWorldState.with(ACTIVATED, active), Block.NOTIFY_ALL);
             // Send messages to nearby players
             if (world instanceof ServerWorld serverWorld) {
-                EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                for (ServerPlayerEntity player : serverWorld.getPlayers()) {
-                    if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                        if (active && headType != null) {
-                            sendActivationMessage(player, headType);
-                        } else if (!active && wasActive) {
-                            // Head was removed - get the old head type from the cached state if possible
-                            // Since we don't have the old head type, we just send a generic message
+                if (active) {
+                    // Activation message
+                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+                    if (headType != null) {
+                        for (ServerPlayerEntity player : serverWorld.getPlayers()) {
+                            if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
+                                sendActivationMessage(player, headType);
+                            }
+                        }
+                    }
+                } else {
+                    // Deactivation message (for when head is broken directly, not via shift+right-click)
+                    // Note: we can't know what head type was removed, so we send a generic message
+                    for (ServerPlayerEntity player : serverWorld.getPlayers()) {
+                        if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
                             sendDeactivationMessageGeneric(player);
                         }
                     }
@@ -479,22 +483,34 @@ public class PikeBlock extends Block
             false
         );
     }
+
     //?} else {
     /*private void updateActivatedState(Level level, BlockPos pos, BlockState state) {
         BlockState headState = level.getBlockState(pos.above());
         boolean active = PikeBlockEntity.isValidHeadBlock(headState);
-        boolean wasActive = state.getValue(ACTIVATED);
+        // Use the actual world state to check wasActive, not the parameter
+        // This prevents duplicate messages when direct handlers already updated the state
+        BlockState currentWorldState = level.getBlockState(pos);
+        boolean wasActive = currentWorldState.getValue(ACTIVATED);
         if (wasActive != active) {
-            level.setBlock(pos, state.setValue(ACTIVATED, active), Block.UPDATE_ALL);
+            level.setBlock(pos, currentWorldState.setValue(ACTIVATED, active), Block.UPDATE_ALL);
             // Send messages to nearby players
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                for (ServerPlayer player : serverLevel.players()) {
-                    if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                        if (active && headType != null) {
-                            sendActivationMessage(player, headType);
-                        } else if (!active && wasActive) {
-                            // Head was removed - send a generic message
+                if (active) {
+                    // Activation message
+                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+                    if (headType != null) {
+                        for (ServerPlayer player : serverLevel.players()) {
+                            if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
+                                sendActivationMessage(player, headType);
+                            }
+                        }
+                    }
+                } else {
+                    // Deactivation message (for when head is broken directly, not via shift+right-click)
+                    // Note: we can't know what head type was removed, so we send a generic message
+                    for (ServerPlayer player : serverLevel.players()) {
+                        if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
                             sendDeactivationMessageGeneric(player);
                         }
                     }
@@ -548,5 +564,6 @@ public class PikeBlock extends Block
             false
         );
     }
+
     *///?}
 }

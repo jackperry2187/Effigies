@@ -10,12 +10,11 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 //?} else {
-/*import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.BlockItem;
+/*import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.DeferredHolder;
 *///?}
 
 public final class ModItems {
@@ -40,13 +39,13 @@ public final class ModItems {
                 .useBlockPrefixedTranslationKey()));
     }
     //?} else {
-    /*public static final DeferredRegister<Item> ITEMS =
-        DeferredRegister.create(Registries.ITEM, Effigies.MOD_ID);
+    /*public static final DeferredRegister.Items ITEMS =
+        DeferredRegister.createItems(Effigies.MOD_ID);
 
-    public static final DeferredHolder<Item, Item> WOODEN_PIKE =
-        ITEMS.register("wooden_pike", () -> new BlockItem(ModBlocks.woodenPike(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> STONE_PIKE =
-        ITEMS.register("stone_pike", () -> new BlockItem(ModBlocks.stonePike(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> WOODEN_PIKE =
+        ITEMS.registerSimpleBlockItem("wooden_pike", ModBlocks.WOODEN_PIKE);
+    public static final DeferredItem<BlockItem> STONE_PIKE =
+        ITEMS.registerSimpleBlockItem("stone_pike", ModBlocks.STONE_PIKE);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
