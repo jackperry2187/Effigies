@@ -26,7 +26,15 @@ public final class ModBlockEntities {
         PIKE = Registry.register(
             Registries.BLOCK_ENTITY_TYPE,
             Effigies.id("pike"),
-            FabricBlockEntityTypeBuilder.create(PikeBlockEntity::new, ModBlocks.woodenPike(), ModBlocks.stonePike()).build()
+            FabricBlockEntityTypeBuilder.create(PikeBlockEntity::new,
+                ModBlocks.woodenPike(),
+                ModBlocks.stonePike(),
+                ModBlocks.copperPike(),
+                ModBlocks.ironPike(),
+                ModBlocks.goldenPike(),
+                ModBlocks.diamondPike(),
+                ModBlocks.netheritePike()
+            ).build()
         );
     }
 
@@ -40,7 +48,15 @@ public final class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PikeBlockEntity>> PIKE =
         BLOCK_ENTITIES.register(
             "pike",
-            () -> new BlockEntityType<>(PikeBlockEntity::new, ModBlocks.woodenPike(), ModBlocks.stonePike())
+            () -> new BlockEntityType<>(PikeBlockEntity::new,
+                ModBlocks.woodenPike(),
+                ModBlocks.stonePike(),
+                ModBlocks.copperPike(),
+                ModBlocks.ironPike(),
+                ModBlocks.goldenPike(),
+                ModBlocks.diamondPike(),
+                ModBlocks.netheritePike()
+            )
         );
 
     public static void register(IEventBus bus) {

@@ -1,11 +1,9 @@
 package jackperry2187.effigies;
 
-import jackperry2187.effigies.block.PikeBlock;
-import jackperry2187.effigies.block.entity.PikeBlockEntity;
-
 //? if fabric {
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.minecraft.block.entity.BlockEntity;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.registry.Registries;
@@ -14,6 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.WorldChunk;
 //?} else {
 /*import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -24,9 +23,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.level.ChunkEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 *///?}
 
 public final class SpawnPreventionHandler {
@@ -35,6 +36,7 @@ public final class SpawnPreventionHandler {
 
     //? if fabric {
     public static void registerFabric() {
+        // Register mob spawn prevention
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
             if (!(entity instanceof MobEntity mob)) {
                 return;
@@ -48,6 +50,23 @@ public final class SpawnPreventionHandler {
             if (isSpawnBlocked(serverWorld, mob.getBlockPos(), mob.getType())) {
                 mob.discard();
             }
+        });
+
+        // Register chunk load event to scan for active pikes
+        ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+            if (chunk instanceof WorldChunk worldChunk) {
+                PikeRegistry.onChunkLoad(world, worldChunk);
+            }
+        });
+
+        // Register chunk unload event to clear pikes from registry
+        ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+            PikeRegistry.onChunkUnload(world, chunk.getPos().x, chunk.getPos().z);
+        });
+
+        // Register world unload event to clear dimension data
+        ServerWorldEvents.UNLOAD.register((server, world) -> {
+            PikeRegistry.onWorldUnload(world.getRegistryKey());
         });
     }
     //?} else {
@@ -67,133 +86,90 @@ public final class SpawnPreventionHandler {
             event.setCanceled(true);
         }
     }
+
+    @SubscribeEvent
+    public static void onChunkLoad(ChunkEvent.Load event) {
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        if (!(event.getChunk() instanceof LevelChunk levelChunk)) {
+            return;
+        }
+        PikeRegistry.onChunkLoad(serverLevel, levelChunk);
+    }
+
+    @SubscribeEvent
+    public static void onChunkUnload(ChunkEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        PikeRegistry.onChunkUnload(serverLevel, event.getChunk().getPos().x, event.getChunk().getPos().z);
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        PikeRegistry.onWorldUnload(serverLevel.dimension());
+    }
     *///?}
 
     //? if fabric {
     private static boolean isSpawnBlocked(ServerWorld level, BlockPos spawnPos, EntityType<?> entityType) {
-        int spawnChunkX = spawnPos.getX() >> 4;
-        int spawnChunkZ = spawnPos.getZ() >> 4;
-
-        int maxRadius = 0;
-        for (PikeTier tier : PikeTier.values()) {
-            maxRadius = Math.max(maxRadius, tier.chunkRadius());
-        }
-
-        for (int dx = -maxRadius; dx <= maxRadius; dx++) {
-            for (int dz = -maxRadius; dz <= maxRadius; dz++) {
-                int chunkX = spawnChunkX + dx;
-                int chunkZ = spawnChunkZ + dz;
-                for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
-                    if (!(blockEntity instanceof PikeBlockEntity pike)) {
-                        continue;
-                    }
-                    BlockPos pikePos = pike.getPos();
-                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(level.getBlockState(pikePos.up()));
-                    if (headType != entityType) {
-                        continue;
-                    }
-                    int pikeChunkX = pikePos.getX() >> 4;
-                    int pikeChunkZ = pikePos.getZ() >> 4;
-                    PikeTier tier = getTierFromBlock(pike.getCachedState().getBlock());
-                    if (tier == null) {
-                        continue;
-                    }
-                    int chunkDistance = Math.max(Math.abs(pikeChunkX - spawnChunkX), Math.abs(pikeChunkZ - spawnChunkZ));
-                    if (chunkDistance <= tier.chunkRadius()) {
-                        // Send message to nearby players
-                        String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
-                        for (ServerPlayerEntity player : level.getPlayers()) {
-                            if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
-                                player.sendMessage(
-                                    Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-                                        .append(Text.literal("Prevented ").formatted(Formatting.RED))
-                                        .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-                                        .append(Text.literal(" spawn at ").formatted(Formatting.RED))
-                                        .append(Text.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").formatted(Formatting.AQUA))
-                                        .append(Text.literal(" due to effigy at ").formatted(Formatting.RED))
-                                        .append(Text.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").formatted(Formatting.AQUA)),
-                                    false
-                                );
-                            }
-                        }
-                        return true;
-                    }
+        // Use the efficient pike registry for spawn checking
+        PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
+        
+        if (blockingPike != null) {
+            // Send message to nearby players
+            BlockPos pikePos = blockingPike.pos();
+            String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
+            for (ServerPlayerEntity player : level.getPlayers()) {
+                if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
+                    player.sendMessage(
+                        Text.literal("[Effigies] ").formatted(Formatting.GOLD)
+                            .append(Text.literal("Prevented ").formatted(Formatting.RED))
+                            .append(Text.literal(entityName).formatted(Formatting.YELLOW))
+                            .append(Text.literal(" spawn at ").formatted(Formatting.RED))
+                            .append(Text.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").formatted(Formatting.AQUA))
+                            .append(Text.literal(" due to effigy at ").formatted(Formatting.RED))
+                            .append(Text.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").formatted(Formatting.AQUA)),
+                        false
+                    );
                 }
             }
+            return true;
         }
 
         return false;
     }
     //?} else {
     /*private static boolean isSpawnBlocked(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
-        int spawnChunkX = spawnPos.getX() >> 4;
-        int spawnChunkZ = spawnPos.getZ() >> 4;
-
-        int maxRadius = 0;
-        for (PikeTier tier : PikeTier.values()) {
-            maxRadius = Math.max(maxRadius, tier.chunkRadius());
-        }
-
-        for (int dx = -maxRadius; dx <= maxRadius; dx++) {
-            for (int dz = -maxRadius; dz <= maxRadius; dz++) {
-                int chunkX = spawnChunkX + dx;
-                int chunkZ = spawnChunkZ + dz;
-                for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
-                    if (!(blockEntity instanceof PikeBlockEntity pike)) {
-                        continue;
-                    }
-                    BlockPos pikePos = pike.getBlockPos();
-                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(level.getBlockState(pikePos.above()));
-                    if (headType != entityType) {
-                        continue;
-                    }
-                    int pikeChunkX = pikePos.getX() >> 4;
-                    int pikeChunkZ = pikePos.getZ() >> 4;
-                    PikeTier tier = getTierFromBlock(pike.getBlockState().getBlock());
-                    if (tier == null) {
-                        continue;
-                    }
-                    int chunkDistance = Math.max(Math.abs(pikeChunkX - spawnChunkX), Math.abs(pikeChunkZ - spawnChunkZ));
-                    if (chunkDistance <= tier.chunkRadius()) {
-                        // Send message to nearby players
-                        String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
-                        for (ServerPlayer player : level.players()) {
-                            if (player.distanceToSqr(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
-                                player.displayClientMessage(
-                                    Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
-                                        .append(Component.literal("Prevented ").withStyle(ChatFormatting.RED))
-                                        .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
-                                        .append(Component.literal(" spawn at ").withStyle(ChatFormatting.RED))
-                                        .append(Component.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").withStyle(ChatFormatting.AQUA))
-                                        .append(Component.literal(" due to effigy at ").withStyle(ChatFormatting.RED))
-                                        .append(Component.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").withStyle(ChatFormatting.AQUA)),
-                                    false
-                                );
-                            }
-                        }
-                        return true;
-                    }
+        // Use the efficient pike registry for spawn checking
+        PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
+        
+        if (blockingPike != null) {
+            // Send message to nearby players
+            BlockPos pikePos = blockingPike.pos();
+            String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
+            for (ServerPlayer player : level.players()) {
+                if (player.distanceToSqr(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
+                    player.displayClientMessage(
+                        Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
+                            .append(Component.literal("Prevented ").withStyle(ChatFormatting.RED))
+                            .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
+                            .append(Component.literal(" spawn at ").withStyle(ChatFormatting.RED))
+                            .append(Component.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").withStyle(ChatFormatting.AQUA))
+                            .append(Component.literal(" due to effigy at ").withStyle(ChatFormatting.RED))
+                            .append(Component.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").withStyle(ChatFormatting.AQUA)),
+                        false
+                    );
                 }
             }
+            return true;
         }
 
         return false;
-    }
-    *///?}
-
-    //? if fabric {
-    private static PikeTier getTierFromBlock(net.minecraft.block.Block block) {
-        if (block instanceof PikeBlock pikeBlock) {
-            return pikeBlock.tier();
-        }
-        return null;
-    }
-    //?} else {
-    /*private static PikeTier getTierFromBlock(net.minecraft.world.level.block.Block block) {
-        if (block instanceof PikeBlock pikeBlock) {
-            return pikeBlock.tier();
-        }
-        return null;
     }
     *///?}
 }

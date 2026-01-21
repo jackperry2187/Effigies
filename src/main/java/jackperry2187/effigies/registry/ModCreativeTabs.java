@@ -37,6 +37,11 @@ public final class ModCreativeTabs {
                 .entries((context, entries) -> {
                     entries.add(ModBlocks.woodenPike());
                     entries.add(ModBlocks.stonePike());
+                    entries.add(ModBlocks.copperPike());
+                    entries.add(ModBlocks.ironPike());
+                    entries.add(ModBlocks.goldenPike());
+                    entries.add(ModBlocks.diamondPike());
+                    entries.add(ModBlocks.netheritePike());
                 })
                 .build()
         );
@@ -56,6 +61,11 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModBlocks.woodenPike());
                 output.accept(ModBlocks.stonePike());
+                output.accept(ModBlocks.copperPike());
+                output.accept(ModBlocks.ironPike());
+                output.accept(ModBlocks.goldenPike());
+                output.accept(ModBlocks.diamondPike());
+                output.accept(ModBlocks.netheritePike());
             })
             .build()
         );

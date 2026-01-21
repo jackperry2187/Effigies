@@ -34,6 +34,56 @@ public enum PikeTier {
         *///?}
         1.5F,
         6.0F
+    ),
+    COPPER(
+        2,
+        //? if fabric {
+        BlockSoundGroup.COPPER,
+        //?} else {
+        /*SoundType.COPPER,
+        *///?}
+        3.0F,
+        6.0F
+    ),
+    IRON(
+        4,
+        //? if fabric {
+        BlockSoundGroup.METAL,
+        //?} else {
+        /*SoundType.METAL,
+        *///?}
+        5.0F,
+        6.0F
+    ),
+    GOLDEN(
+        6,
+        //? if fabric {
+        BlockSoundGroup.METAL,
+        //?} else {
+        /*SoundType.METAL,
+        *///?}
+        3.0F,
+        6.0F
+    ),
+    DIAMOND(
+        8,
+        //? if fabric {
+        BlockSoundGroup.METAL,
+        //?} else {
+        /*SoundType.METAL,
+        *///?}
+        5.0F,
+        6.0F
+    ),
+    NETHERITE(
+        16,
+        //? if fabric {
+        BlockSoundGroup.NETHERITE,
+        //?} else {
+        /*SoundType.NETHERITE_BLOCK,
+        *///?}
+        50.0F,
+        1200.0F
     );
 
     private final int chunkRadius;

@@ -1,5 +1,10 @@
 {
   "block.effigies.wooden_pike": "Wooden Pike",
   "block.effigies.stone_pike": "Stone Pike",
+  "block.effigies.copper_pike": "Copper Pike",
+  "block.effigies.iron_pike": "Iron Pike",
+  "block.effigies.golden_pike": "Golden Pike",
+  "block.effigies.diamond_pike": "Diamond Pike",
+  "block.effigies.netherite_pike": "Netherite Pike",
   "itemGroup.effigies": "Effigies"
 }

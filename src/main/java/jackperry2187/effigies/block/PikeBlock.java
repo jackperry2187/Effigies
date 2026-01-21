@@ -1,5 +1,6 @@
 package jackperry2187.effigies.block;
 
+import jackperry2187.effigies.PikeRegistry;
 import jackperry2187.effigies.PikeTier;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -205,6 +206,10 @@ public class PikeBlock extends Block
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient()) {
+            // Unregister from pike registry if it was active
+            if (state.get(ACTIVATED) && world instanceof ServerWorld serverWorld) {
+                PikeRegistry.unregisterPike(serverWorld, pos);
+            }
             breakHeadAbove(world, pos);
         }
         return super.onBreak(world, pos, state, player);
@@ -212,6 +217,11 @@ public class PikeBlock extends Block
 
     @Override
     public void onDestroyedByExplosion(ServerWorld world, BlockPos pos, Explosion explosion) {
+        // Unregister from pike registry (we check the block state before it's destroyed)
+        BlockState state = world.getBlockState(pos);
+        if (state.getBlock() instanceof PikeBlock && state.get(ACTIVATED)) {
+            PikeRegistry.unregisterPike(world, pos);
+        }
         breakHeadAbove(world, pos);
         super.onDestroyedByExplosion(world, pos, explosion);
     }
@@ -346,6 +356,10 @@ public class PikeBlock extends Block
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
+            // Unregister from pike registry if it was active
+            if (state.getValue(ACTIVATED) && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                PikeRegistry.unregisterPike(serverLevel, pos);
+            }
             breakHeadAbove(level, pos);
         }
         return super.playerWillDestroy(level, pos, state, player);
@@ -353,7 +367,11 @@ public class PikeBlock extends Block
 
     @Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        if (level instanceof Level serverLevel && !serverLevel.isClientSide()) {
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            // Unregister from pike registry if it was active
+            if (state.getValue(ACTIVATED)) {
+                PikeRegistry.unregisterPike(serverLevel, pos);
+            }
             breakHeadAbove(serverLevel, pos);
         }
         super.destroy(level, pos, state);
@@ -419,6 +437,8 @@ public class PikeBlock extends Block
                     // Activation message
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
                     if (headType != null) {
+                        // Register pike in the registry for efficient spawn blocking
+                        PikeRegistry.registerPike(serverWorld, pos, tier, headType);
                         for (ServerPlayerEntity player : serverWorld.getPlayers()) {
                             if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
                                 sendActivationMessage(player, headType);
@@ -426,6 +446,8 @@ public class PikeBlock extends Block
                         }
                     }
                 } else {
+                    // Unregister pike from the registry
+                    PikeRegistry.unregisterPike(serverWorld, pos);
                     // Deactivation message (for when head is broken directly, not via shift+right-click)
                     // Note: we can't know what head type was removed, so we send a generic message
                     for (ServerPlayerEntity player : serverWorld.getPlayers()) {
@@ -500,6 +522,8 @@ public class PikeBlock extends Block
                     // Activation message
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
                     if (headType != null) {
+                        // Register pike in the registry for efficient spawn blocking
+                        PikeRegistry.registerPike(serverLevel, pos, tier, headType);
                         for (ServerPlayer player : serverLevel.players()) {
                             if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
                                 sendActivationMessage(player, headType);
@@ -507,6 +531,8 @@ public class PikeBlock extends Block
                         }
                     }
                 } else {
+                    // Unregister pike from the registry
+                    PikeRegistry.unregisterPike(serverLevel, pos);
                     // Deactivation message (for when head is broken directly, not via shift+right-click)
                     // Note: we can't know what head type was removed, so we send a generic message
                     for (ServerPlayer player : serverLevel.players()) {

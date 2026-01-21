@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "activated=false": { "model": "effigies:block/pike_copper" },
+    "activated=true": { "model": "effigies:block/pike_copper" }
+  }
+}
