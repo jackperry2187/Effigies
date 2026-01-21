@@ -1,4 +1,5 @@
 {
   "block.effigies.wooden_pike": "Wooden Pike",
-  "block.effigies.stone_pike": "Stone Pike"
+  "block.effigies.stone_pike": "Stone Pike",
+  "itemGroup.effigies": "Effigies"
 }
