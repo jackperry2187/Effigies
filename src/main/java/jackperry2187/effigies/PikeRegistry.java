@@ -338,16 +338,17 @@ public final class PikeRegistry {
         return null;
     }
 
-    /**
-     * Gets the number of registered pikes for debugging purposes.
-     */
-    public static int getRegisteredPikeCount() {
-        int count = 0;
-        for (Map<Long, List<PikeData>> dimensionPikes : pikesByDimension.values()) {
-            for (List<PikeData> chunkPikes : dimensionPikes.values()) {
-                count += chunkPikes.size();
-            }
-        }
-        return count;
-    }
+    // Debug method - commented out for release
+    // /**
+    //  * Gets the number of registered pikes for debugging purposes.
+    //  */
+    // public static int getRegisteredPikeCount() {
+    //     int count = 0;
+    //     for (Map<Long, List<PikeData>> dimensionPikes : pikesByDimension.values()) {
+    //         for (List<PikeData> chunkPikes : dimensionPikes.values()) {
+    //             count += chunkPikes.size();
+    //         }
+    //     }
+    //     return count;
+    // }
 }

@@ -6,20 +6,22 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
+// Debug imports - uncomment when re-enabling debug messages
+// import net.minecraft.registry.Registries;
+// import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+// import net.minecraft.text.Text;
+// import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 //?} else {
-/*import net.minecraft.ChatFormatting;
+/*// Debug imports - uncomment when re-enabling debug messages
+// import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
+// import net.minecraft.core.registries.BuiltInRegistries;
+// import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+// import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -121,23 +123,23 @@ public final class SpawnPreventionHandler {
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         
         if (blockingPike != null) {
-            // Send message to nearby players
-            BlockPos pikePos = blockingPike.pos();
-            String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
-            for (ServerPlayerEntity player : level.getPlayers()) {
-                if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
-                    player.sendMessage(
-                        Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-                            .append(Text.literal("Prevented ").formatted(Formatting.RED))
-                            .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-                            .append(Text.literal(" spawn at ").formatted(Formatting.RED))
-                            .append(Text.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").formatted(Formatting.AQUA))
-                            .append(Text.literal(" due to effigy at ").formatted(Formatting.RED))
-                            .append(Text.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").formatted(Formatting.AQUA)),
-                        false
-                    );
-                }
-            }
+            // Debug: Send message to nearby players (commented out for release)
+            // BlockPos pikePos = blockingPike.pos();
+            // String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
+            // for (ServerPlayerEntity player : level.getPlayers()) {
+            //     if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
+            //         player.sendMessage(
+            //             Text.literal("[Effigies] ").formatted(Formatting.GOLD)
+            //                 .append(Text.literal("Prevented ").formatted(Formatting.RED))
+            //                 .append(Text.literal(entityName).formatted(Formatting.YELLOW))
+            //                 .append(Text.literal(" spawn at ").formatted(Formatting.RED))
+            //                 .append(Text.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").formatted(Formatting.AQUA))
+            //                 .append(Text.literal(" due to effigy at ").formatted(Formatting.RED))
+            //                 .append(Text.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").formatted(Formatting.AQUA)),
+            //             false
+            //         );
+            //     }
+            // }
             return true;
         }
 
@@ -149,23 +151,23 @@ public final class SpawnPreventionHandler {
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         
         if (blockingPike != null) {
-            // Send message to nearby players
-            BlockPos pikePos = blockingPike.pos();
-            String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
-            for (ServerPlayer player : level.players()) {
-                if (player.distanceToSqr(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
-                    player.displayClientMessage(
-                        Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal("Prevented ").withStyle(ChatFormatting.RED))
-                            .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
-                            .append(Component.literal(" spawn at ").withStyle(ChatFormatting.RED))
-                            .append(Component.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").withStyle(ChatFormatting.AQUA))
-                            .append(Component.literal(" due to effigy at ").withStyle(ChatFormatting.RED))
-                            .append(Component.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").withStyle(ChatFormatting.AQUA)),
-                        false
-                    );
-                }
-            }
+            // Debug: Send message to nearby players (commented out for release)
+            // BlockPos pikePos = blockingPike.pos();
+            // String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
+            // for (ServerPlayer player : level.players()) {
+            //     if (player.distanceToSqr(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
+            //         player.displayClientMessage(
+            //             Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
+            //                 .append(Component.literal("Prevented ").withStyle(ChatFormatting.RED))
+            //                 .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
+            //                 .append(Component.literal(" spawn at ").withStyle(ChatFormatting.RED))
+            //                 .append(Component.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").withStyle(ChatFormatting.AQUA))
+            //                 .append(Component.literal(" due to effigy at ").withStyle(ChatFormatting.RED))
+            //                 .append(Component.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").withStyle(ChatFormatting.AQUA)),
+            //             false
+            //         );
+            //     }
+            // }
             return true;
         }
 

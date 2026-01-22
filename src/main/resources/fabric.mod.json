@@ -5,13 +5,13 @@
     "name": "Effigies",
     "description": "A Minecraft mod that adds powerful mob spawning prevention options to the game.",
     "authors": [
-        "JackPerry2187"
+        "jackperry2187"
     ],
     "contact": {
         "sources": "https://github.com/jackperry2187/Effigies",
         "issues": "https://github.com/jackperry2187/Effigies/issues"
     },
-    "license": "MIT",
+    "license": "GLGPL-3.0",
     "icon": "assets/effigies/icon.png",
     "environment": "*",
     "entrypoints": {

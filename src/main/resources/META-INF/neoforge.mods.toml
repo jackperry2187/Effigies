@@ -1,13 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
-license = "MIT"
+license = "GLGPL-3.0"
 issueTrackerURL = "https://github.com/jackperry2187/Effigies/issues"
 
 [[mods]]
 modId = "effigies"
 version = "${version}"
 displayName = "Effigies"
-authors = "JackPerry2187"
+authors = "jackperry2187"
 description = '''
 A Minecraft mod that adds powerful mob spawning prevention options to the game.
 '''

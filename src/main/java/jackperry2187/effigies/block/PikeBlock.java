@@ -16,13 +16,14 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
+// Debug imports - uncomment when re-enabling debug messages
+// import net.minecraft.registry.Registries;
+// import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.text.Text;
+// import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
+// import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -38,14 +39,14 @@ import net.minecraft.world.tick.ScheduledTickView;
 import net.minecraft.world.block.WireOrientation;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.explosion.Explosion;
-import org.jetbrains.annotations.Nullable;
 //?} else {
-/*import net.minecraft.ChatFormatting;
+/*// Debug imports - uncomment when re-enabling debug messages
+// import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
+// import net.minecraft.core.registries.BuiltInRegistries;
+// import net.minecraft.network.chat.Component;
+// import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -71,7 +72,6 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 *///?}
 
 public class PikeBlock extends Block
@@ -138,12 +138,9 @@ public class PikeBlock extends Block
             return ActionResult.PASS;
         }
         if (!world.isClient()) {
-            EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-            // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
+            // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
             world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
             world.breakBlock(headPos, true);
-            // Send deactivation message
-            sendDeactivationMessage(player, headType);
         }
         return ActionResult.SUCCESS;
     }
@@ -164,12 +161,9 @@ public class PikeBlock extends Block
             BlockState headState = world.getBlockState(headPos);
             if (PikeBlockEntity.isValidHeadBlock(headState)) {
                 if (!world.isClient()) {
-                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                    // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
+                    // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
                     world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
                     world.breakBlock(headPos, true);
-                    // Send deactivation message
-                    sendDeactivationMessage(player, headType);
                 }
                 return ActionResult.SUCCESS;
             }
@@ -288,12 +282,9 @@ public class PikeBlock extends Block
             return InteractionResult.PASS;
         }
         if (!level.isClientSide()) {
-            EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-            // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
+            // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
             level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
             level.destroyBlock(headPos, true);
-            // Send deactivation message
-            sendDeactivationMessage(player, headType);
         }
         return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
     }
@@ -314,12 +305,9 @@ public class PikeBlock extends Block
             BlockState headState = level.getBlockState(headPos);
             if (PikeBlockEntity.isValidHeadBlock(headState)) {
                 if (!level.isClientSide()) {
-                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-                    // Set state to false BEFORE breaking head to prevent duplicate message from updateActivatedState
+                    // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
                     level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
                     level.destroyBlock(headPos, true);
-                    // Send deactivation message
-                    sendDeactivationMessage(player, headType);
                 }
                 return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
             }
@@ -426,35 +414,21 @@ public class PikeBlock extends Block
         BlockState headState = world.getBlockState(pos.up());
         boolean active = PikeBlockEntity.isValidHeadBlock(headState);
         // Use the actual world state to check wasActive, not the parameter
-        // This prevents duplicate messages when direct handlers already updated the state
+        // This prevents duplicate handling when direct handlers already updated the state
         BlockState currentWorldState = world.getBlockState(pos);
         boolean wasActive = currentWorldState.get(ACTIVATED);
         if (wasActive != active) {
             world.setBlockState(pos, currentWorldState.with(ACTIVATED, active), Block.NOTIFY_ALL);
-            // Send messages to nearby players
             if (world instanceof ServerWorld serverWorld) {
                 if (active) {
-                    // Activation message
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
                     if (headType != null) {
                         // Register pike in the registry for efficient spawn blocking
                         PikeRegistry.registerPike(serverWorld, pos, tier, headType);
-                        for (ServerPlayerEntity player : serverWorld.getPlayers()) {
-                            if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                                sendActivationMessage(player, headType);
-                            }
-                        }
                     }
                 } else {
                     // Unregister pike from the registry
                     PikeRegistry.unregisterPike(serverWorld, pos);
-                    // Deactivation message (for when head is broken directly, not via shift+right-click)
-                    // Note: we can't know what head type was removed, so we send a generic message
-                    for (ServerPlayerEntity player : serverWorld.getPlayers()) {
-                        if (player.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                            sendDeactivationMessageGeneric(player);
-                        }
-                    }
                 }
             }
         }
@@ -473,73 +447,60 @@ public class PikeBlock extends Block
         return state.isAir() || state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.LAVA;
     }
 
-    private void sendActivationMessage(PlayerEntity player, EntityType<?> headType) {
-        String entityName = Registries.ENTITY_TYPE.getId(headType).getPath();
-        int chunkRadius = tier.chunkRadius();
-        String radiusText = chunkRadius == 0 ? "same chunk only" : chunkRadius + " chunk" + (chunkRadius > 1 ? "s" : "") + " radius";
-        player.sendMessage(
-            Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-                .append(Text.literal("Now preventing ").formatted(Formatting.GREEN))
-                .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-                .append(Text.literal(" spawns within ").formatted(Formatting.GREEN))
-                .append(Text.literal(radiusText).formatted(Formatting.AQUA)),
-            false
-        );
-    }
+    // Debug messages - commented out for release
+    // private void sendActivationMessage(PlayerEntity player, EntityType<?> headType) {
+    //     String entityName = Registries.ENTITY_TYPE.getId(headType).getPath();
+    //     int chunkRadius = tier.chunkRadius();
+    //     String radiusText = chunkRadius == 0 ? "same chunk only" : chunkRadius + " chunk" + (chunkRadius > 1 ? "s" : "") + " radius";
+    //     player.sendMessage(
+    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
+    //             .append(Text.literal("Now preventing ").formatted(Formatting.GREEN))
+    //             .append(Text.literal(entityName).formatted(Formatting.YELLOW))
+    //             .append(Text.literal(" spawns within ").formatted(Formatting.GREEN))
+    //             .append(Text.literal(radiusText).formatted(Formatting.AQUA)),
+    //         false
+    //     );
+    // }
 
-    private void sendDeactivationMessage(PlayerEntity player, EntityType<?> headType) {
-        String entityName = headType != null ? Registries.ENTITY_TYPE.getId(headType).getPath() : "unknown";
-        player.sendMessage(
-            Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-                .append(Text.literal("No longer preventing ").formatted(Formatting.RED))
-                .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-                .append(Text.literal(" spawns.").formatted(Formatting.RED)),
-            false
-        );
-    }
+    // private void sendDeactivationMessage(PlayerEntity player, EntityType<?> headType) {
+    //     String entityName = headType != null ? Registries.ENTITY_TYPE.getId(headType).getPath() : "unknown";
+    //     player.sendMessage(
+    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
+    //             .append(Text.literal("No longer preventing ").formatted(Formatting.RED))
+    //             .append(Text.literal(entityName).formatted(Formatting.YELLOW))
+    //             .append(Text.literal(" spawns.").formatted(Formatting.RED)),
+    //         false
+    //     );
+    // }
 
-    private void sendDeactivationMessageGeneric(PlayerEntity player) {
-        player.sendMessage(
-            Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-                .append(Text.literal("Pike deactivated - head removed.").formatted(Formatting.RED)),
-            false
-        );
-    }
+    // private void sendDeactivationMessageGeneric(PlayerEntity player) {
+    //     player.sendMessage(
+    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
+    //             .append(Text.literal("Pike deactivated - head removed.").formatted(Formatting.RED)),
+    //         false
+    //     );
+    // }
 
     //?} else {
     /*private void updateActivatedState(Level level, BlockPos pos, BlockState state) {
         BlockState headState = level.getBlockState(pos.above());
         boolean active = PikeBlockEntity.isValidHeadBlock(headState);
         // Use the actual world state to check wasActive, not the parameter
-        // This prevents duplicate messages when direct handlers already updated the state
+        // This prevents duplicate handling when direct handlers already updated the state
         BlockState currentWorldState = level.getBlockState(pos);
         boolean wasActive = currentWorldState.getValue(ACTIVATED);
         if (wasActive != active) {
             level.setBlock(pos, currentWorldState.setValue(ACTIVATED, active), Block.UPDATE_ALL);
-            // Send messages to nearby players
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 if (active) {
-                    // Activation message
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
                     if (headType != null) {
                         // Register pike in the registry for efficient spawn blocking
                         PikeRegistry.registerPike(serverLevel, pos, tier, headType);
-                        for (ServerPlayer player : serverLevel.players()) {
-                            if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                                sendActivationMessage(player, headType);
-                            }
-                        }
                     }
                 } else {
                     // Unregister pike from the registry
                     PikeRegistry.unregisterPike(serverLevel, pos);
-                    // Deactivation message (for when head is broken directly, not via shift+right-click)
-                    // Note: we can't know what head type was removed, so we send a generic message
-                    for (ServerPlayer player : serverLevel.players()) {
-                        if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 64 * 64) {
-                            sendDeactivationMessageGeneric(player);
-                        }
-                    }
                 }
             }
         }
@@ -558,38 +519,39 @@ public class PikeBlock extends Block
         return state.isAir() || state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.LAVA;
     }
 
-    private void sendActivationMessage(Player player, EntityType<?> headType) {
-        String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(headType).getPath();
-        int chunkRadius = tier.chunkRadius();
-        String radiusText = chunkRadius == 0 ? "same chunk only" : chunkRadius + " chunk" + (chunkRadius > 1 ? "s" : "") + " radius";
-        player.displayClientMessage(
-            Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
-                .append(Component.literal("Now preventing ").withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal(" spawns within ").withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(radiusText).withStyle(ChatFormatting.AQUA)),
-            false
-        );
-    }
+    // Debug messages - commented out for release
+    // private void sendActivationMessage(Player player, EntityType<?> headType) {
+    //     String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(headType).getPath();
+    //     int chunkRadius = tier.chunkRadius();
+    //     String radiusText = chunkRadius == 0 ? "same chunk only" : chunkRadius + " chunk" + (chunkRadius > 1 ? "s" : "") + " radius";
+    //     player.displayClientMessage(
+    //         Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
+    //             .append(Component.literal("Now preventing ").withStyle(ChatFormatting.GREEN))
+    //             .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
+    //             .append(Component.literal(" spawns within ").withStyle(ChatFormatting.GREEN))
+    //             .append(Component.literal(radiusText).withStyle(ChatFormatting.AQUA)),
+    //         false
+    //     );
+    // }
 
-    private void sendDeactivationMessage(Player player, EntityType<?> headType) {
-        String entityName = headType != null ? BuiltInRegistries.ENTITY_TYPE.getKey(headType).getPath() : "unknown";
-        player.displayClientMessage(
-            Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
-                .append(Component.literal("No longer preventing ").withStyle(ChatFormatting.RED))
-                .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal(" spawns.").withStyle(ChatFormatting.RED)),
-            false
-        );
-    }
+    // private void sendDeactivationMessage(Player player, EntityType<?> headType) {
+    //     String entityName = headType != null ? BuiltInRegistries.ENTITY_TYPE.getKey(headType).getPath() : "unknown";
+    //     player.displayClientMessage(
+    //         Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
+    //             .append(Component.literal("No longer preventing ").withStyle(ChatFormatting.RED))
+    //             .append(Component.literal(entityName).withStyle(ChatFormatting.YELLOW))
+    //             .append(Component.literal(" spawns.").withStyle(ChatFormatting.RED)),
+    //         false
+    //     );
+    // }
 
-    private void sendDeactivationMessageGeneric(Player player) {
-        player.displayClientMessage(
-            Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
-                .append(Component.literal("Pike deactivated - head removed.").withStyle(ChatFormatting.RED)),
-            false
-        );
-    }
+    // private void sendDeactivationMessageGeneric(Player player) {
+    //     player.displayClientMessage(
+    //         Component.literal("[Effigies] ").withStyle(ChatFormatting.GOLD)
+    //             .append(Component.literal("Pike deactivated - head removed.").withStyle(ChatFormatting.RED)),
+    //         false
+    //     );
+    // }
 
     *///?}
 }
