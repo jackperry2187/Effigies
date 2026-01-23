@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 // import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.particle.ParticleTypes;
 //?} else {
 /*// Debug imports - uncomment when re-enabling debug messages
 // import net.minecraft.ChatFormatting;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.core.particles.ParticleTypes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
@@ -123,8 +125,21 @@ public final class SpawnPreventionHandler {
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         
         if (blockingPike != null) {
+            // Spawn particles at the pike to indicate it blocked a spawn
+            BlockPos pikePos = blockingPike.pos();
+            level.spawnParticles(
+                ParticleTypes.FLAME,
+                pikePos.getX() + 0.5,
+                pikePos.getY() + 1.5,  // At head height
+                pikePos.getZ() + 0.5,
+                1,      // particle count
+                0.3,    // deltaX
+                0.3,    // deltaY
+                0.3,    // deltaZ
+                0.0     // speed
+            );
+
             // Debug: Send message to nearby players (commented out for release)
-            // BlockPos pikePos = blockingPike.pos();
             // String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
             // for (ServerPlayerEntity player : level.getPlayers()) {
             //     if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
@@ -151,8 +166,21 @@ public final class SpawnPreventionHandler {
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         
         if (blockingPike != null) {
+            // Spawn particles at the pike to indicate it blocked a spawn
+            BlockPos pikePos = blockingPike.pos();
+            level.sendParticles(
+                ParticleTypes.FLAME,
+                pikePos.getX() + 0.5,
+                pikePos.getY() + 1.5,  // At head height
+                pikePos.getZ() + 0.5,
+                1,      // particle count
+                0.3,    // deltaX
+                0.3,    // deltaY
+                0.3,    // deltaZ
+                0.0     // speed
+            );
+
             // Debug: Send message to nearby players (commented out for release)
-            // BlockPos pikePos = blockingPike.pos();
             // String entityName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
             // for (ServerPlayer player : level.players()) {
             //     if (player.distanceToSqr(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {

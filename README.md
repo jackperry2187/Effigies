@@ -18,6 +18,9 @@ Effigies supports multiple Minecraft versions and mod loaders:
     - Pikes also have item tooltips in-game describing their range
 - Place a Pike block in the world, then right-click it with a mob head (or place the mob head on top of it) to activate it
     - When active, the Pike will prevent that mob type from spawning within its area of effect
+        - Fire particles spawn when it becomes active!
+        - Fire particles will also spawn whenever the Pike successfully prevents a mob spawn
+        - Smoke particles spawn when it becomes inactive (the head is removed)
     - Supported mob heads: Skeleton, Wither Skeleton, Zombie, Creeper, and Piglin
         - More to come soon!
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
@@ -47,7 +50,5 @@ Inactive (left) and Active (right) Diamond Pikes
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
 
 ## Upcoming Features
-- Activation/Deactivation sounds and/or particles
-- Particles when the pike prevents a spawn
 - Config file for pike tier/range(s)
   - Activate/deactivate different tiers of pikes, i.e. allow for a range of -1 == cosmetic block only
