@@ -215,7 +215,10 @@ public final class PikeRegistry {
                 continue;
             }
             BlockPos pos = blockEntity.getPos();
-            BlockState state = level.getBlockState(pos);
+            // Use chunk.getBlockState() instead of level.getBlockState() to avoid
+            // potential deadlock during chunk loading (the chunk may not be fully
+            // registered with the world yet)
+            BlockState state = chunk.getBlockState(pos);
             if (!(state.getBlock() instanceof PikeBlock pikeBlock)) {
                 continue;
             }
@@ -224,7 +227,8 @@ public final class PikeRegistry {
                 continue;
             }
             // Get the entity type from the head above
-            BlockState headState = level.getBlockState(pos.up());
+            // The head is in the same chunk (only Y differs), so use chunk.getBlockState()
+            BlockState headState = chunk.getBlockState(pos.up());
             EntityType<?> entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
             if (entityType == null) {
                 continue;
@@ -239,7 +243,9 @@ public final class PikeRegistry {
                 continue;
             }
             BlockPos pos = blockEntity.getBlockPos();
-            BlockState state = level.getBlockState(pos);
+            // Use chunk.getBlockState() instead of level.getBlockState() to avoid
+            // potential issues during chunk loading
+            BlockState state = chunk.getBlockState(pos);
             if (!(state.getBlock() instanceof PikeBlock pikeBlock)) {
                 continue;
             }
@@ -248,7 +254,8 @@ public final class PikeRegistry {
                 continue;
             }
             // Get the entity type from the head above
-            BlockState headState = level.getBlockState(pos.above());
+            // The head is in the same chunk (only Y differs), so use chunk.getBlockState()
+            BlockState headState = chunk.getBlockState(pos.above());
             EntityType<?> entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
             if (entityType == null) {
                 continue;

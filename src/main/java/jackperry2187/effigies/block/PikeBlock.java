@@ -39,6 +39,7 @@ import net.minecraft.world.tick.ScheduledTickView;
 import net.minecraft.world.block.WireOrientation;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.explosion.Explosion;
+import net.minecraft.particle.ParticleTypes;
 //?} else {
 /*// Debug imports - uncomment when re-enabling debug messages
 // import net.minecraft.ChatFormatting;
@@ -72,6 +73,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.core.particles.ParticleTypes;
 *///?}
 
 public class PikeBlock extends Block
@@ -141,6 +143,20 @@ public class PikeBlock extends Block
             // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
             world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
             world.breakBlock(headPos, true);
+            // Spawn deactivation particles (must do manually since we bypassed updateActivatedState)
+            if (world instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                    ParticleTypes.SMOKE,
+                    pos.getX() + 0.5,
+                    pos.getY() + 1.5,
+                    pos.getZ() + 0.5,
+                    15,    // particle count
+                    0.3,   // deltaX (horizontal spread)
+                    0.4,   // deltaY (vertical spread)
+                    0.3,   // deltaZ (horizontal spread)
+                    0.02   // speed
+                );
+            }
         }
         return ActionResult.SUCCESS;
     }
@@ -164,6 +180,20 @@ public class PikeBlock extends Block
                     // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
                     world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
                     world.breakBlock(headPos, true);
+                    // Spawn deactivation particles (must do manually since we bypassed updateActivatedState)
+                    if (world instanceof ServerWorld serverWorld) {
+                        serverWorld.spawnParticles(
+                            ParticleTypes.SMOKE,
+                            pos.getX() + 0.5,
+                            pos.getY() + 1.5,
+                            pos.getZ() + 0.5,
+                            15,    // particle count
+                            0.3,   // deltaX (horizontal spread)
+                            0.4,   // deltaY (vertical spread)
+                            0.3,   // deltaZ (horizontal spread)
+                            0.02   // speed
+                        );
+                    }
                 }
                 return ActionResult.SUCCESS;
             }
@@ -285,6 +315,20 @@ public class PikeBlock extends Block
             // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
             level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
             level.destroyBlock(headPos, true);
+            // Spawn deactivation particles (must do manually since we bypassed updateActivatedState)
+            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                serverLevel.sendParticles(
+                    ParticleTypes.SMOKE,
+                    pos.getX() + 0.5,
+                    pos.getY() + 1.5,
+                    pos.getZ() + 0.5,
+                    15,    // particle count
+                    0.3,   // deltaX (horizontal spread)
+                    0.4,   // deltaY (vertical spread)
+                    0.3,   // deltaZ (horizontal spread)
+                    0.02   // speed
+                );
+            }
         }
         return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
     }
@@ -308,6 +352,20 @@ public class PikeBlock extends Block
                     // Set state to false BEFORE breaking head to prevent duplicate handling from updateActivatedState
                     level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
                     level.destroyBlock(headPos, true);
+                    // Spawn deactivation particles (must do manually since we bypassed updateActivatedState)
+                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                        serverLevel.sendParticles(
+                            ParticleTypes.SMOKE,
+                            pos.getX() + 0.5,
+                            pos.getY() + 1.5,
+                            pos.getZ() + 0.5,
+                            15,    // particle count
+                            0.3,   // deltaX (horizontal spread)
+                            0.4,   // deltaY (vertical spread)
+                            0.3,   // deltaZ (horizontal spread)
+                            0.02   // speed
+                        );
+                    }
                 }
                 return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
             }
@@ -425,10 +483,34 @@ public class PikeBlock extends Block
                     if (headType != null) {
                         // Register pike in the registry for efficient spawn blocking
                         PikeRegistry.registerPike(serverWorld, pos, tier, headType);
+                        // Spawn activation particles
+                        serverWorld.spawnParticles(
+                            ParticleTypes.FLAME,
+                            pos.getX() + 0.5,
+                            pos.getY() + 1.5,
+                            pos.getZ() + 0.5,
+                            15,    // particle count
+                            0.3,   // deltaX (horizontal spread)
+                            0.4,   // deltaY (vertical spread)
+                            0.3,   // deltaZ (horizontal spread)
+                            0.02   // speed
+                        );
                     }
                 } else {
                     // Unregister pike from the registry
                     PikeRegistry.unregisterPike(serverWorld, pos);
+                    // Spawn deactivation particles
+                    serverWorld.spawnParticles(
+                        ParticleTypes.SMOKE,
+                        pos.getX() + 0.5,
+                        pos.getY() + 1.5,
+                        pos.getZ() + 0.5,
+                        15,    // particle count
+                        0.3,   // deltaX (horizontal spread)
+                        0.4,   // deltaY (vertical spread)
+                        0.3,   // deltaZ (horizontal spread)
+                        0.02   // speed
+                    );
                 }
             }
         }
@@ -497,10 +579,34 @@ public class PikeBlock extends Block
                     if (headType != null) {
                         // Register pike in the registry for efficient spawn blocking
                         PikeRegistry.registerPike(serverLevel, pos, tier, headType);
+                        // Spawn activation particles
+                        serverLevel.sendParticles(
+                            ParticleTypes.FLAME,
+                            pos.getX() + 0.5,
+                            pos.getY() + 1.5,
+                            pos.getZ() + 0.5,
+                            15,    // particle count
+                            0.3,   // deltaX (horizontal spread)
+                            0.4,   // deltaY (vertical spread)
+                            0.3,   // deltaZ (horizontal spread)
+                            0.02   // speed
+                        );
                     }
                 } else {
                     // Unregister pike from the registry
                     PikeRegistry.unregisterPike(serverLevel, pos);
+                    // Spawn deactivation particles
+                    serverLevel.sendParticles(
+                        ParticleTypes.SMOKE,
+                        pos.getX() + 0.5,
+                        pos.getY() + 1.5,
+                        pos.getZ() + 0.5,
+                        15,    // particle count
+                        0.3,   // deltaX (horizontal spread)
+                        0.4,   // deltaY (vertical spread)
+                        0.3,   // deltaZ (horizontal spread)
+                        0.02   // speed
+                    );
                 }
             }
         }
