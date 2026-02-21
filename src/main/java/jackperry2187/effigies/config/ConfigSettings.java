@@ -85,6 +85,38 @@ public final class ConfigSettings {
     }
 
     /**
+     * Applies config values synced from the server.
+     * Called on the client when receiving the config sync packet.
+     */
+    public static void applySyncedValues(ConfigSyncPayload payload) {
+        woodenPikeRadius = payload.woodenPikeRadius();
+        stonePikeRadius = payload.stonePikeRadius();
+        copperPikeRadius = payload.copperPikeRadius();
+        ironPikeRadius = payload.ironPikeRadius();
+        goldenPikeRadius = payload.goldenPikeRadius();
+        diamondPikeRadius = payload.diamondPikeRadius();
+        netheritePikeRadius = payload.netheritePikeRadius();
+        Effigies.LOGGER.info("Config synced from server: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}",
+            woodenPikeRadius, stonePikeRadius, copperPikeRadius, ironPikeRadius,
+            goldenPikeRadius, diamondPikeRadius, netheritePikeRadius);
+    }
+
+    /**
+     * Reloads config values from the config file.
+     * Called on server start to ensure local config values are restored
+     * (e.g. after returning from a multiplayer server to singleplayer).
+     */
+    public static void reload() {
+        Path configFile = InitializeConfig.getConfigFilePath();
+        if (!Files.exists(configFile)) {
+            Effigies.LOGGER.warn("Config file not found during reload, keeping current values");
+            return;
+        }
+        readConfigFile(configFile);
+        Effigies.LOGGER.info("Config reloaded from file");
+    }
+
+    /**
      * Reads and parses the config file, populating static fields.
      */
     private static void readConfigFile(Path configFile) {

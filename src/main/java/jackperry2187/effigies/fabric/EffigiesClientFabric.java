@@ -1,9 +1,12 @@
 //? if fabric {
 package jackperry2187.effigies.fabric;
 
+import jackperry2187.effigies.config.ConfigSettings;
+import jackperry2187.effigies.config.ConfigSyncPayload;
 import jackperry2187.effigies.item.PikeItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -12,6 +15,11 @@ public class EffigiesClientFabric implements ClientModInitializer {
     public void onInitializeClient() {
         // Render types are handled via data-driven models in 1.21+
         // The block models specify "render_type": "cutout" for transparency
+
+        // Register config sync receiver
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.ID, (payload, context) -> {
+            ConfigSettings.applySyncedValues(payload);
+        });
 
         // Register pike item tooltips
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {

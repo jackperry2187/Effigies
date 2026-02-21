@@ -51,7 +51,7 @@ Inactive (left) and Active (right) Diamond Pikes
 - Each Pike only prevents the spawn of the mob type matching the head placed on it
 - Multiple Pikes with different heads can be used to prevent multiple mob types from spawning within the radius
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
-- When connecting to a server, the server's config will overwrite the client's. This is to preserve the accuracy of the tooltips
+- When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used.
 
 ## Upcoming Features
 - Config options for defining heads (even from other mods!) and what kinds of mobs they prevent from spawning

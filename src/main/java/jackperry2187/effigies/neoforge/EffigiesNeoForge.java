@@ -4,14 +4,20 @@
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.SpawnPreventionHandler;
 import jackperry2187.effigies.config.ConfigSettings;
+import jackperry2187.effigies.config.ConfigSyncPayload;
 import jackperry2187.effigies.config.InitializeConfig;
 import jackperry2187.effigies.registry.ModBlockEntities;
 import jackperry2187.effigies.registry.ModBlocks;
 import jackperry2187.effigies.registry.ModCreativeTabs;
 import jackperry2187.effigies.registry.ModItems;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 @Mod(Effigies.MOD_ID)
 public class EffigiesNeoForge {
@@ -29,8 +35,32 @@ public class EffigiesNeoForge {
         ModCreativeTabs.register(modBus);
 
         NeoForge.EVENT_BUS.register(SpawnPreventionHandler.class);
+
+        // Register config sync networking
+        modBus.addListener(EffigiesNeoForge::onRegisterPayloads);
+        NeoForge.EVENT_BUS.addListener(EffigiesNeoForge::onPlayerJoin);
+        NeoForge.EVENT_BUS.addListener(EffigiesNeoForge::onServerStarting);
         
         Effigies.LOGGER.info("Effigies initialized successfully!");
+    }
+
+    private static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar(Effigies.MOD_ID);
+        registrar.playToClient(
+            ConfigSyncPayload.TYPE,
+            ConfigSyncPayload.STREAM_CODEC,
+            (payload, context) -> context.enqueueWork(() -> ConfigSettings.applySyncedValues(payload))
+        );
+    }
+
+    private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            PacketDistributor.sendToPlayer(player, ConfigSyncPayload.fromCurrentConfig());
+        }
+    }
+
+    private static void onServerStarting(ServerStartingEvent event) {
+        ConfigSettings.reload();
     }
 }
 *///?}
