@@ -2,6 +2,7 @@ package jackperry2187.effigies;
 
 import jackperry2187.effigies.block.PikeBlock;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
+import jackperry2187.effigies.config.ConfigSettings;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -60,17 +61,21 @@ public final class PikeRegistry {
     /*private static final Map<ResourceKey<Level>, Map<Long, List<PikeData>>> pikesByDimension = new ConcurrentHashMap<>();
     *///?}
 
-    // Cache the max chunk radius for efficient range checking
-    private static int maxChunkRadius = -1;
-
+    /**
+     * Gets the maximum chunk radius across all pike tiers.
+     * Uses config values when available, falls back to hardcoded defaults.
+     */
     private static int getMaxChunkRadius() {
-        if (maxChunkRadius < 0) {
-            maxChunkRadius = 0;
-            for (PikeTier tier : PikeTier.values()) {
-                maxChunkRadius = Math.max(maxChunkRadius, tier.chunkRadius());
-            }
+        // Use config values when initialized for consistency
+        if (ConfigSettings.isInitialized()) {
+            return ConfigSettings.getMaxPikeRadius();
         }
-        return maxChunkRadius;
+        // Fallback to computing from enum defaults (shouldn't happen in normal flow)
+        int maxRadius = 0;
+        for (PikeTier tier : PikeTier.values()) {
+            maxRadius = Math.max(maxRadius, tier.defaultChunkRadius());
+        }
+        return maxRadius;
     }
 
     /**
@@ -323,18 +328,21 @@ public final class PikeRegistry {
                 
                 synchronized (chunkPikes) {
                     for (PikeData pike : chunkPikes) {
-                        // Check if entity type matches
+                        int pikeRadius = pike.tier().chunkRadius();
+                        if (pikeRadius < 0) {
+                            continue;
+                        }
+
                         if (pike.entityType() != entityType) {
                             continue;
                         }
                         
-                        // Check if spawn is within this pike's range
                         int chunkDistance = Math.max(
                             Math.abs(pike.chunkX() - spawnChunkX),
                             Math.abs(pike.chunkZ() - spawnChunkZ)
                         );
                         
-                        if (chunkDistance <= pike.tier().chunkRadius()) {
+                        if (chunkDistance <= pikeRadius) {
                             return pike;
                         }
                     }

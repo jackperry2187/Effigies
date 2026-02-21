@@ -16,6 +16,9 @@ Effigies supports multiple Minecraft versions and mod loaders:
 - Adds 7 new Pikes (one for each spear variant) that prevent specific mob types from spawning within a radius based on their tier
     - Refer to the **Pike Table** below for specifics about the radius and recipes
     - Pikes also have item tooltips in-game describing their range
+    - Radius' can now also be customized via the `config/effigies-config.toml` file
+        - You can disable Pikes from preventing spawns by setting the radius to `-1`
+        - Any config options will also update the in-game tooltips
 - Place a Pike block in the world, then right-click it with a mob head (or place the mob head on top of it) to activate it
     - When active, the Pike will prevent that mob type from spawning within its area of effect
         - Fire particles spawn when it becomes active!
@@ -46,9 +49,9 @@ Inactive (left) and Active (right) Diamond Pikes
 ## Notes
 
 - Each Pike only prevents the spawn of the mob type matching the head placed on it
-- Multiple Pikes with different heads can be used to prevent multiple mob types
+- Multiple Pikes with different heads can be used to prevent multiple mob types from spawning within the radius
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
+- When connecting to a server, the server's config will overwrite the client's. This is to preserve the accuracy of the tooltips
 
 ## Upcoming Features
-- Config file for pike tier/range(s)
-  - Activate/deactivate different tiers of pikes, i.e. allow for a range of -1 == cosmetic block only
+- Config options for defining heads (even from other mods!) and what kinds of mobs they prevent from spawning

@@ -1,5 +1,7 @@
 package jackperry2187.effigies;
 
+import jackperry2187.effigies.config.ConfigSettings;
+
 //? if fabric {
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.registry.RegistryKey;
@@ -111,7 +113,23 @@ public enum PikeTier {
         this.resistance = resistance;
     }
 
+    /**
+     * Returns the chunk radius for this pike tier.
+     * If config is initialized, returns the configured value.
+     * Otherwise, returns the hardcoded default.
+     */
     public int chunkRadius() {
+        if (ConfigSettings.isInitialized()) {
+            return ConfigSettings.getPikeRadius(this);
+        }
+        return chunkRadius; // fallback to hardcoded default
+    }
+
+    /**
+     * Returns the hardcoded default chunk radius.
+     * Used internally, config values take precedence via chunkRadius().
+     */
+    public int defaultChunkRadius() {
         return chunkRadius;
     }
 

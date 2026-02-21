@@ -1,5 +1,8 @@
 package jackperry2187.effigies;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //? if fabric {
 import net.minecraft.util.Identifier;
 //?} else {
@@ -8,6 +11,7 @@ import net.minecraft.util.Identifier;
 
 public final class Effigies {
     public static final String MOD_ID = "effigies";
+    public static final Logger LOGGER = LoggerFactory.getLogger("Effigies");
 
     private Effigies() {
     }

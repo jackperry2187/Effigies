@@ -7,6 +7,7 @@
   "block.effigies.diamond_pike": "Diamond Pike",
   "block.effigies.netherite_pike": "Netherite Pike",
   "itemGroup.effigies": "Effigies",
+  "item.effigies.pike.tooltip.disabled": "Does not prevent mob spawns [Disabled by Config].",
   "item.effigies.pike.tooltip.prevents_spawns": "Prevents mob spawns in",
   "item.effigies.pike.tooltip.chunk_only": "the chunk it's in.",
   "item.effigies.pike.tooltip.chunk_radius": "the chunk it's in + %s chunk radius.",

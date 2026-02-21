@@ -16,19 +16,17 @@ public class EffigiesClientNeoForge {
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         if (event.getItemStack().getItem() instanceof PikeItem pikeItem) {
-            // Line 1: "Prevents mob spawns in"
-            event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.prevents_spawns").withStyle(ChatFormatting.GRAY));
-
-            // Line 2: Range description
-            if (pikeItem.getTier().chunkRadius() == 0) {
-                // Wooden pike - just the chunk it's in
-                event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.chunk_only").withStyle(ChatFormatting.GRAY));
+            int radius = pikeItem.getTier().chunkRadius();
+            if (radius < 0) {
+                event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.disabled").withStyle(ChatFormatting.GRAY));
             } else {
-                // Other pikes - chunk + chunk radius
-                event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.chunk_radius", pikeItem.getTier().chunkRadius()).withStyle(ChatFormatting.GRAY));
+                event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.prevents_spawns").withStyle(ChatFormatting.GRAY));
+                if (radius == 0) {
+                    event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.chunk_only").withStyle(ChatFormatting.GRAY));
+                } else {
+                    event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.chunk_radius", radius).withStyle(ChatFormatting.GRAY));
+                }
             }
-
-            // Line 3: Activation instruction
             event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
