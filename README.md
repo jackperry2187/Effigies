@@ -24,8 +24,11 @@ Effigies supports multiple Minecraft versions and mod loaders:
         - Fire particles spawn when it becomes active!
         - Fire particles will also spawn whenever the Pike successfully prevents a mob spawn
         - Smoke particles spawn when it becomes inactive (the head is removed)
-    - Supported mob heads: Skeleton, Wither Skeleton, Zombie, Creeper, and Piglin
-        - More to come soon!
+    - Supported mob heads by default: Skeleton, Wither Skeleton, Zombie, Creeper, and Piglin
+        - Completely configurable via the `config/effigies-config.toml` file
+        - Supports vanilla definitions, such as `minecraft:sand=minecraft:zombie` to make sand prevent zombie spawns
+        - Also supports modded definitions, such as `ecologics:coconut_planks=ecologics:penguin` to make coconut planks prevent penguin spawns
+        - Also supports multiple references, so adding both `minecraft:sand=minecraft:zombie` and `minecraft:zombie_head=minecraft:zombie` would mean either sand or a zombie head would work as intended!
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
 - Breaking a Pike will drop both the Pike block and the head (if activated)
 - Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
@@ -36,7 +39,7 @@ Inactive (left) and Active (right) Diamond Pikes
 
 ## Pike Table
 
-| Tier | Recipe | Area of Effect |
+| Tier | Recipe | Default Area of Effect |
 | ---- | ------ | -------------- | 
 | Wooden | 1 Wooden Spear + 2 Sticks | 1 Chunk (the chunk it's in) |
 | Stone | 1 Stone Spear + 2 Sticks | 1 Chunk + 1 Radius (the chunk it's in + all 8 surrounding chunks) |
@@ -51,7 +54,10 @@ Inactive (left) and Active (right) Diamond Pikes
 - Each Pike only prevents the spawn of the mob type matching the head placed on it
 - Multiple Pikes with different heads can be used to prevent multiple mob types from spawning within the radius
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
-- When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used.
+- When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 
 ## Upcoming Features
-- Config options for defining heads (even from other mods!) and what kinds of mobs they prevent from spawning
+- Recipes to turn lower-tier pikes into higher-tier ones (wooden pike + 1 cobblestone + 1 stick = stone pike or similar)
+- Size all valid blocks placed on top to be "head sized" (since non-heads look bad covering the whole top of the pike)
+- Visual cues/UI/display to show what mob is being prevented
+- JEI integration (or similar, maybe a guidebook) to show what blocks will prevent which mobs

@@ -214,9 +214,10 @@ public class PikeBlock extends Block
             return ActionResult.PASS;
         }
         if (!world.isClient()) {
-            // Set rotation to face the player (skull looks back at the player who placed it)
-            int rotation = MathHelper.floor((double) (player.getYaw() * 16.0F / 360.0F) + 0.5D) & 15;
-            headState = headState.with(SkullBlock.ROTATION, rotation);
+            if (headState.getBlock() instanceof SkullBlock) {
+                int rotation = MathHelper.floor((double) (player.getYaw() * 16.0F / 360.0F) + 0.5D) & 15;
+                headState = headState.with(SkullBlock.ROTATION, rotation);
+            }
             world.setBlockState(headPos, headState, Block.NOTIFY_ALL);
             world.setBlockState(pos, state.with(ACTIVATED, true), Block.NOTIFY_ALL);
             if (!player.getAbilities().creativeMode) {
@@ -386,9 +387,10 @@ public class PikeBlock extends Block
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!level.isClientSide()) {
-            // Set rotation to face the player (skull looks back at the player who placed it)
-            int rotation = Mth.floor((double) (player.getYRot() * 16.0F / 360.0F) + 0.5D) & 15;
-            headState = headState.setValue(SkullBlock.ROTATION, rotation);
+            if (headState.getBlock() instanceof SkullBlock) {
+                int rotation = Mth.floor((double) (player.getYRot() * 16.0F / 360.0F) + 0.5D) & 15;
+                headState = headState.setValue(SkullBlock.ROTATION, rotation);
+            }
             level.setBlock(headPos, headState, Block.UPDATE_ALL);
             level.setBlock(pos, state.setValue(ACTIVATED, true), Block.UPDATE_ALL);
             if (!player.getAbilities().instabuild) {

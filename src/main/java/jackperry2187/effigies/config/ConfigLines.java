@@ -17,16 +17,18 @@ public final class ConfigLines {
      * Includes comments explaining each option and default values.
      */
     public static List<String> getBaseConfigLines() {
-        return new ArrayList<>(Arrays.asList(
+        List<String> lines = new ArrayList<>(Arrays.asList(
             "### Effigies Configuration",
-            "### This file is auto-generated. Edit values below to customize pike ranges.",
-            "### Radius values are measured in chunks (16 blocks per chunk).",
-            "### A radius of -1 disables the pike tier (it will never block spawns).",
-            "### A radius of 0 means the pike only affects the chunk it's placed in.",
-            "### A radius of 1 means the pike affects its chunk plus 1 chunk in each direction (3x3 area).",
-            "",
+            "### This file is auto-generated.",
             "# Config version - do not modify manually",
             "configVersion=" + CONFIG_VERSION,
+            "",
+            "### Pike Radius Values",
+            "# Radius values are measured in chunks (16 blocks per chunk).",
+            "# A radius of -1 disables the pike tier (it will never block spawns).",
+            "# A radius of 0 means the pike only affects the chunk it's placed in.",
+            "# A radius of 1 means the pike affects its chunk plus 1 chunk in each direction (3x3 area).",
+            
             "",
             "# Wooden Pike - Basic tier, affects only its own chunk",
             "wooden_pike_radius=" + WOODEN_PIKE_RADIUS,
@@ -47,7 +49,17 @@ public final class ConfigLines {
             "diamond_pike_radius=" + DIAMOND_PIKE_RADIUS,
             "",
             "# Netherite Pike - Maximum range",
-            "netherite_pike_radius=" + NETHERITE_PIKE_RADIUS
+            "netherite_pike_radius=" + NETHERITE_PIKE_RADIUS,
+            "",
+            "### Block to Entity Mappings",
+            "# Format: block_id=entity_id",
+            "# These define which blocks can be placed on pikes and which mobs they prevent from spawning.",
+            "# Uses namespace:id format - works with vanilla and modded blocks/entities.",
+            "# Example: minecraft:sand=minecraft:zombie (sand block prevents zombie spawns)",
+            "# Example: ecologics:coconut_planks=ecologics:penguin (modded blocks/entities work too)",
+            "# Check the Minecraft console for errors/warnings if mappings are not working."
         ));
+        lines.addAll(DEFAULT_BLOCK_ENTITY_MAPPINGS);
+        return lines;
     }
 }

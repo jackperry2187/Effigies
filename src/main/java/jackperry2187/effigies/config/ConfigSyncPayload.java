@@ -2,6 +2,9 @@ package jackperry2187.effigies.config;
 
 import jackperry2187.effigies.Effigies;
 
+import java.util.HashMap;
+import java.util.Map;
+
 //? if fabric {
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -25,7 +28,8 @@ public record ConfigSyncPayload(
     int ironPikeRadius,
     int goldenPikeRadius,
     int diamondPikeRadius,
-    int netheritePikeRadius
+    int netheritePikeRadius,
+    Map<String, String> blockEntityMappings
 //? if fabric {
 ) implements CustomPayload {
 //?} else {
@@ -38,10 +42,19 @@ public record ConfigSyncPayload(
     public static final PacketCodec<RegistryByteBuf, ConfigSyncPayload> CODEC = new PacketCodec<>() {
         @Override
         public ConfigSyncPayload decode(RegistryByteBuf buf) {
-            return new ConfigSyncPayload(
-                buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(),
-                buf.readInt(), buf.readInt(), buf.readInt()
-            );
+            int wooden = buf.readInt();
+            int stone = buf.readInt();
+            int copper = buf.readInt();
+            int iron = buf.readInt();
+            int golden = buf.readInt();
+            int diamond = buf.readInt();
+            int netherite = buf.readInt();
+            int mappingCount = buf.readInt();
+            Map<String, String> mappings = new HashMap<>(mappingCount);
+            for (int i = 0; i < mappingCount; i++) {
+                mappings.put(buf.readString(), buf.readString());
+            }
+            return new ConfigSyncPayload(wooden, stone, copper, iron, golden, diamond, netherite, mappings);
         }
 
         @Override
@@ -53,6 +66,12 @@ public record ConfigSyncPayload(
             buf.writeInt(value.goldenPikeRadius());
             buf.writeInt(value.diamondPikeRadius());
             buf.writeInt(value.netheritePikeRadius());
+            Map<String, String> mappings = value.blockEntityMappings();
+            buf.writeInt(mappings.size());
+            for (Map.Entry<String, String> entry : mappings.entrySet()) {
+                buf.writeString(entry.getKey());
+                buf.writeString(entry.getValue());
+            }
         }
     };
 
@@ -66,10 +85,19 @@ public record ConfigSyncPayload(
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigSyncPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public ConfigSyncPayload decode(RegistryFriendlyByteBuf buf) {
-            return new ConfigSyncPayload(
-                buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(),
-                buf.readInt(), buf.readInt(), buf.readInt()
-            );
+            int wooden = buf.readInt();
+            int stone = buf.readInt();
+            int copper = buf.readInt();
+            int iron = buf.readInt();
+            int golden = buf.readInt();
+            int diamond = buf.readInt();
+            int netherite = buf.readInt();
+            int mappingCount = buf.readInt();
+            Map<String, String> mappings = new HashMap<>(mappingCount);
+            for (int i = 0; i < mappingCount; i++) {
+                mappings.put(buf.readUtf(), buf.readUtf());
+            }
+            return new ConfigSyncPayload(wooden, stone, copper, iron, golden, diamond, netherite, mappings);
         }
 
         @Override
@@ -81,6 +109,12 @@ public record ConfigSyncPayload(
             buf.writeInt(value.goldenPikeRadius());
             buf.writeInt(value.diamondPikeRadius());
             buf.writeInt(value.netheritePikeRadius());
+            Map<String, String> mappings = value.blockEntityMappings();
+            buf.writeInt(mappings.size());
+            for (Map.Entry<String, String> entry : mappings.entrySet()) {
+                buf.writeUtf(entry.getKey());
+                buf.writeUtf(entry.getValue());
+            }
         }
     };
 
@@ -98,7 +132,8 @@ public record ConfigSyncPayload(
             ConfigSettings.ironPikeRadius,
             ConfigSettings.goldenPikeRadius,
             ConfigSettings.diamondPikeRadius,
-            ConfigSettings.netheritePikeRadius
+            ConfigSettings.netheritePikeRadius,
+            ConfigSettings.getBlockToEntityMappings()
         );
     }
 }

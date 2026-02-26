@@ -3,6 +3,7 @@ package jackperry2187.effigies.fabric;
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.SpawnPreventionHandler;
+import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.config.ConfigSyncPayload;
 import jackperry2187.effigies.config.InitializeConfig;
@@ -41,6 +42,7 @@ public class EffigiesFabric implements ModInitializer {
         // Reload config from file on server start to restore local values after multiplayer
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             ConfigSettings.reload();
+            PikeBlockEntity.validateMappings();
         });
         
         Effigies.LOGGER.info("Effigies initialized successfully!");

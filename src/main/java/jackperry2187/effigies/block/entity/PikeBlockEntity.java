@@ -1,24 +1,32 @@
 package jackperry2187.effigies.block.entity;
 
+import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.registry.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 //? if fabric {
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SkullBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 //?} else {
-/*import net.minecraft.core.BlockPos;
+/*import net.neoforged.fml.ModList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 *///?}
@@ -42,40 +50,31 @@ public class PikeBlockEntity extends BlockEntity {
 
     @Nullable
     public static BlockState getHeadBlockStateForItem(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return null;
+        }
         //? if fabric {
-        if (stack.isOf(Items.SKELETON_SKULL)) {
-            return Blocks.SKELETON_SKULL.getDefaultState();
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return null;
         }
-        if (stack.isOf(Items.WITHER_SKELETON_SKULL)) {
-            return Blocks.WITHER_SKELETON_SKULL.getDefaultState();
-        }
-        if (stack.isOf(Items.ZOMBIE_HEAD)) {
-            return Blocks.ZOMBIE_HEAD.getDefaultState();
-        }
-        if (stack.isOf(Items.CREEPER_HEAD)) {
-            return Blocks.CREEPER_HEAD.getDefaultState();
-        }
-        if (stack.isOf(Items.PIGLIN_HEAD)) {
-            return Blocks.PIGLIN_HEAD.getDefaultState();
-        }
+        Block block = blockItem.getBlock();
+        String blockId = Registries.BLOCK.getId(block).toString();
         //?} else {
-        /*if (stack.is(Items.SKELETON_SKULL)) {
-            return Blocks.SKELETON_SKULL.defaultBlockState();
+        /*if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return null;
         }
-        if (stack.is(Items.WITHER_SKELETON_SKULL)) {
-            return Blocks.WITHER_SKELETON_SKULL.defaultBlockState();
-        }
-        if (stack.is(Items.ZOMBIE_HEAD)) {
-            return Blocks.ZOMBIE_HEAD.defaultBlockState();
-        }
-        if (stack.is(Items.CREEPER_HEAD)) {
-            return Blocks.CREEPER_HEAD.defaultBlockState();
-        }
-        if (stack.is(Items.PIGLIN_HEAD)) {
-            return Blocks.PIGLIN_HEAD.defaultBlockState();
-        }
+        Block block = blockItem.getBlock();
+        String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
         *///?}
-        return null;
+        String entityId = ConfigSettings.getEntityIdForBlock(blockId);
+        if (entityId == null) {
+            return null;
+        }
+        //? if fabric {
+        return block.getDefaultState();
+        //?} else {
+        /*return block.defaultBlockState();
+        *///?}
     }
 
     @Nullable
@@ -84,96 +83,119 @@ public class PikeBlockEntity extends BlockEntity {
             return null;
         }
         //? if fabric {
-        if (stack.isOf(Items.SKELETON_SKULL)) {
-            return EntityType.SKELETON;
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return null;
         }
-        if (stack.isOf(Items.WITHER_SKELETON_SKULL)) {
-            return EntityType.WITHER_SKELETON;
-        }
-        if (stack.isOf(Items.ZOMBIE_HEAD)) {
-            return EntityType.ZOMBIE;
-        }
-        if (stack.isOf(Items.CREEPER_HEAD)) {
-            return EntityType.CREEPER;
-        }
-        if (stack.isOf(Items.PIGLIN_HEAD)) {
-            return EntityType.PIGLIN;
-        }
+        Block block = blockItem.getBlock();
+        String blockId = Registries.BLOCK.getId(block).toString();
         //?} else {
-        /*if (stack.is(Items.SKELETON_SKULL)) {
-            return EntityType.SKELETON;
+        /*if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return null;
         }
-        if (stack.is(Items.WITHER_SKELETON_SKULL)) {
-            return EntityType.WITHER_SKELETON;
-        }
-        if (stack.is(Items.ZOMBIE_HEAD)) {
-            return EntityType.ZOMBIE;
-        }
-        if (stack.is(Items.CREEPER_HEAD)) {
-            return EntityType.CREEPER;
-        }
-        if (stack.is(Items.PIGLIN_HEAD)) {
-            return EntityType.PIGLIN;
-        }
+        Block block = blockItem.getBlock();
+        String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
         *///?}
-        return null;
+        return resolveEntityType(blockId);
     }
 
     @Nullable
     public static EntityType<?> getHeadTypeFromBlockState(BlockState state) {
         //? if fabric {
-        if (state.getBlock() instanceof SkullBlock skullBlock) {
-            SkullBlock.SkullType type = skullBlock.getSkullType();
-            return getHeadTypeFromSkullType(type);
-        }
+        String blockId = Registries.BLOCK.getId(state.getBlock()).toString();
         //?} else {
-        /*if (state.getBlock() instanceof SkullBlock skullBlock) {
-            SkullBlock.Type type = skullBlock.getType();
-            return getHeadTypeFromSkullType(type);
-        }
+        /*String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
         *///?}
-        return null;
+        return resolveEntityType(blockId);
     }
 
-    //? if fabric {
+    /**
+     * Resolves a block ID to its mapped EntityType via config, or null if not configured
+     * or the entity type cannot be found in the registry.
+     */
     @Nullable
-    private static EntityType<?> getHeadTypeFromSkullType(SkullBlock.SkullType type) {
-        if (type == SkullBlock.Type.SKELETON) {
-            return EntityType.SKELETON;
+    private static EntityType<?> resolveEntityType(String blockId) {
+        String entityId = ConfigSettings.getEntityIdForBlock(blockId);
+        if (entityId == null) {
+            return null;
         }
-        if (type == SkullBlock.Type.WITHER_SKELETON) {
-            return EntityType.WITHER_SKELETON;
+        String[] parts = entityId.split(":", 2);
+        if (parts.length != 2) {
+            Effigies.LOGGER.error("Invalid entity ID format in block-entity mapping: {}", entityId);
+            return null;
         }
-        if (type == SkullBlock.Type.ZOMBIE) {
-            return EntityType.ZOMBIE;
+        //? if fabric {
+        Identifier id = Identifier.of(parts[0], parts[1]);
+        if (!Registries.ENTITY_TYPE.containsId(id)) {
+            Effigies.LOGGER.error("Entity type not found in registry for mapping {}={}: {}", blockId, entityId, id);
+            return null;
         }
-        if (type == SkullBlock.Type.CREEPER) {
-            return EntityType.CREEPER;
+        return Registries.ENTITY_TYPE.get(id);
+        //?} else {
+        /*Identifier id = Identifier.fromNamespaceAndPath(parts[0], parts[1]);
+        if (!BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
+            Effigies.LOGGER.error("Entity type not found in registry for mapping {}={}: {}", blockId, entityId, id);
+            return null;
         }
-        if (type == SkullBlock.Type.PIGLIN) {
-            return EntityType.PIGLIN;
-        }
-        return null;
+        return BuiltInRegistries.ENTITY_TYPE.getValue(id);
+        *///?}
     }
-    //?} else {
-    /*@Nullable
-    private static EntityType<?> getHeadTypeFromSkullType(SkullBlock.Type type) {
-        if (type == SkullBlock.Types.SKELETON) {
-            return EntityType.SKELETON;
-        }
-        if (type == SkullBlock.Types.WITHER_SKELETON) {
-            return EntityType.WITHER_SKELETON;
-        }
-        if (type == SkullBlock.Types.ZOMBIE) {
-            return EntityType.ZOMBIE;
-        }
-        if (type == SkullBlock.Types.CREEPER) {
-            return EntityType.CREEPER;
-        }
-        if (type == SkullBlock.Types.PIGLIN) {
-            return EntityType.PIGLIN;
-        }
-        return null;
+
+    private static boolean isModLoaded(String modId) {
+        //? if fabric {
+        return FabricLoader.getInstance().isModLoaded(modId);
+        //?} else {
+        /*return ModList.get().isLoaded(modId);
+        *///?}
     }
-    *///?}
+
+    /**
+     * Validates all block-to-entity mappings against the registries.
+     * Should be called on server start when all registries are frozen.
+     * Logs errors for any block or entity IDs that don't exist in the registries.
+     */
+    public static void validateMappings() {
+        Map<String, String> mappings = ConfigSettings.getBlockToEntityMappings();
+        int invalidCount = 0;
+        for (Map.Entry<String, String> entry : mappings.entrySet()) {
+            String blockIdStr = entry.getKey();
+            String entityIdStr = entry.getValue();
+
+            String[] blockParts = blockIdStr.split(":", 2);
+            String[] entityParts = entityIdStr.split(":", 2);
+
+            //? if fabric {
+            Identifier blockId = Identifier.of(blockParts[0], blockParts[1]);
+            Identifier entityId = Identifier.of(entityParts[0], entityParts[1]);
+            boolean blockExists = Registries.BLOCK.containsId(blockId);
+            boolean entityExists = Registries.ENTITY_TYPE.containsId(entityId);
+            //?} else {
+            /*Identifier blockId = Identifier.fromNamespaceAndPath(blockParts[0], blockParts[1]);
+            Identifier entityId = Identifier.fromNamespaceAndPath(entityParts[0], entityParts[1]);
+            boolean blockExists = BuiltInRegistries.BLOCK.containsKey(blockId);
+            boolean entityExists = BuiltInRegistries.ENTITY_TYPE.containsKey(entityId);
+            *///?}
+
+            if (!blockExists) {
+                invalidCount++;
+                if (!blockParts[0].equals("minecraft") && !isModLoaded(blockParts[0])) {
+                    Effigies.LOGGER.error("Mod '{}' is not installed. Block '{}' in mapping '{}={}' will not work.", blockParts[0], blockIdStr, blockIdStr, entityIdStr);
+                } else {
+                    Effigies.LOGGER.error("Block '{}' not found in registry. Mapping '{}={}' will not work.", blockIdStr, blockIdStr, entityIdStr);
+                }
+            }
+            if (!entityExists) {
+                invalidCount++;
+                if (!entityParts[0].equals("minecraft") && !isModLoaded(entityParts[0])) {
+                    Effigies.LOGGER.error("Mod '{}' is not installed. Entity type '{}' in mapping '{}={}' will not work.", entityParts[0], entityIdStr, blockIdStr, entityIdStr);
+                } else {
+                    Effigies.LOGGER.error("Entity type '{}' not found in registry. Mapping '{}={}' will not work.", entityIdStr, blockIdStr, entityIdStr);
+                }
+            }
+        }
+        if (invalidCount > 0) {
+            Effigies.LOGGER.error("Found {} invalid block-to-entity mapping reference(s). Check your Effigies config file.", invalidCount);
+        } else {
+            Effigies.LOGGER.info("All {} block-to-entity mappings validated successfully against registries.", mappings.size());
+        }
+    }
 }

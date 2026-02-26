@@ -2,9 +2,13 @@ package jackperry2187.effigies.config;
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Stores configuration values read from the config file.
@@ -24,6 +28,9 @@ public final class ConfigSettings {
     public static int goldenPikeRadius;
     public static int diamondPikeRadius;
     public static int netheritePikeRadius;
+
+    // Block ID -> Entity ID mappings (e.g. "minecraft:skeleton_skull" -> "minecraft:skeleton")
+    private static Map<String, String> blockToEntityMappings = new HashMap<>();
 
     /**
      * Returns true if the config has been initialized.
@@ -64,6 +71,22 @@ public final class ConfigSettings {
     }
 
     /**
+     * Gets the entity ID mapped to the given block ID, or null if not configured.
+     */
+    @Nullable
+    public static String getEntityIdForBlock(String blockId) {
+        return blockToEntityMappings.get(blockId);
+    }
+
+    /**
+     * Returns an unmodifiable view of the block-to-entity mappings.
+     * Used for config sync and logging.
+     */
+    public static Map<String, String> getBlockToEntityMappings() {
+        return Collections.unmodifiableMap(blockToEntityMappings);
+    }
+
+    /**
      * Initializes config values by reading from the config file.
      * Should be called after InitializeConfig.generateConfigFile().
      */
@@ -96,9 +119,10 @@ public final class ConfigSettings {
         goldenPikeRadius = payload.goldenPikeRadius();
         diamondPikeRadius = payload.diamondPikeRadius();
         netheritePikeRadius = payload.netheritePikeRadius();
-        Effigies.LOGGER.info("Config synced from server: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}",
+        blockToEntityMappings = new HashMap<>(payload.blockEntityMappings());
+        Effigies.LOGGER.info("Config synced from server: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}, mappings={}",
             woodenPikeRadius, stonePikeRadius, copperPikeRadius, ironPikeRadius,
-            goldenPikeRadius, diamondPikeRadius, netheritePikeRadius);
+            goldenPikeRadius, diamondPikeRadius, netheritePikeRadius, blockToEntityMappings.size());
     }
 
     /**
@@ -130,7 +154,17 @@ public final class ConfigSettings {
         diamondPikeRadius = DefaultSettings.DIAMOND_PIKE_RADIUS;
         netheritePikeRadius = DefaultSettings.NETHERITE_PIKE_RADIUS;
 
+        // Populate default block-to-entity mappings
+        blockToEntityMappings = new HashMap<>();
+        for (String mapping : DefaultSettings.DEFAULT_BLOCK_ENTITY_MAPPINGS) {
+            String[] parts = mapping.split("=", 2);
+            if (parts.length == 2) {
+                blockToEntityMappings.put(parts[0].trim(), parts[1].trim());
+            }
+        }
+
         try {
+            boolean foundMappings = false;
             for (String line : Files.readAllLines(configFile)) {
                 // Skip comments and empty lines
                 if (line.startsWith("#") || line.trim().isEmpty()) continue;
@@ -141,7 +175,27 @@ public final class ConfigSettings {
                     if (parts.length == 2) {
                         String key = parts[0].trim();
                         String value = parts[1].trim();
-                        parseConfigValue(key, value);
+                        if (key.contains(":")) {
+                            // Block-to-entity mapping (namespace:id format)
+                            if (!isValidNamespacedId(key)) {
+                                Effigies.LOGGER.error("Invalid block ID format in mapping: '{}={}' (expected namespace:id instead of {})", key, value, key);
+                                continue;
+                            }
+                            if (!isValidNamespacedId(value)) {
+                                Effigies.LOGGER.error("Invalid entity ID format in mapping: '{}={}' (expected namespace:id instead of {})", key, value, value);
+                                continue;
+                            }
+                            if (!foundMappings) {
+                                // First mapping found from file replaces all defaults
+                                blockToEntityMappings.clear();
+                                foundMappings = true;
+                            }
+                            blockToEntityMappings.put(key, value);
+                        } else if (value.contains(":")) {
+                            Effigies.LOGGER.error("Invalid block ID format in mapping: '{}={}' (expected namespace:id instead of {})", key, value, key);
+                        } else {
+                            parseConfigValue(key, value);
+                        }
                     }
                 }
             }
@@ -153,6 +207,7 @@ public final class ConfigSettings {
         Effigies.LOGGER.info("Pike radii: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}",
             woodenPikeRadius, stonePikeRadius, copperPikeRadius, ironPikeRadius,
             goldenPikeRadius, diamondPikeRadius, netheritePikeRadius);
+        Effigies.LOGGER.info("Block-to-entity mappings: {}", blockToEntityMappings);
     }
 
     /**
@@ -169,6 +224,7 @@ public final class ConfigSettings {
                 case "golden_pike_radius" -> goldenPikeRadius = parseRadius(value, "golden", DefaultSettings.GOLDEN_PIKE_RADIUS);
                 case "diamond_pike_radius" -> diamondPikeRadius = parseRadius(value, "diamond", DefaultSettings.DIAMOND_PIKE_RADIUS);
                 case "netherite_pike_radius" -> netheritePikeRadius = parseRadius(value, "netherite", DefaultSettings.NETHERITE_PIKE_RADIUS);
+                default -> Effigies.LOGGER.warn("Unknown config key '{}' with value '{}', ignoring", key, value);
             }
         } catch (NumberFormatException e) {
             Effigies.LOGGER.warn("Invalid value for {}: {}", key, value);
@@ -187,5 +243,18 @@ public final class ConfigSettings {
             return defaultValue;
         }
         return radius;
+    }
+
+    /**
+     * Validates that a string is a valid namespaced ID (namespace:path),
+     * with both namespace and path being non-empty.
+     */
+    private static boolean isValidNamespacedId(String id) {
+        int colonIndex = id.indexOf(':');
+        if (colonIndex <= 0 || colonIndex >= id.length() - 1) {
+            return false;
+        }
+        // Ensure there's only one colon
+        return id.indexOf(':', colonIndex + 1) == -1;
     }
 }

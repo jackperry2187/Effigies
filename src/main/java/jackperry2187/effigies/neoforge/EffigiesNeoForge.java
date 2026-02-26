@@ -3,6 +3,7 @@
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.SpawnPreventionHandler;
+import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.config.ConfigSyncPayload;
 import jackperry2187.effigies.config.InitializeConfig;
@@ -61,6 +62,7 @@ public class EffigiesNeoForge {
 
     private static void onServerStarting(ServerStartingEvent event) {
         ConfigSettings.reload();
+        PikeBlockEntity.validateMappings();
     }
 }
 *///?}
