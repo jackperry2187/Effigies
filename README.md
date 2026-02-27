@@ -39,15 +39,27 @@ Inactive (left) and Active (right) Diamond Pikes
 
 ## Pike Table
 
-| Tier | Recipe | Default Area of Effect |
+| Tier | Default Area of Effect |
+| ---- | -------------- | 
+| Wooden | 1 Chunk (the chunk it's in) |
+| Stone | 1 Chunk + 1 Radius (the chunk it's in + all 8 surrounding chunks) |
+| Copper | 1 Chunk + 2 Radius |
+| Iron | 1 Chunk + 4 Radius |
+| Golden | 1 Chunk + 6 Radius |
+| Diamond | 1 Chunk + 8 Radius |
+| Netherite | 1 Chunk + 16 Radius |
+
+## Recipes
+
+| Tier | Recipe | "Upgrade" Recipe |
 | ---- | ------ | -------------- | 
-| Wooden | 1 Wooden Spear + 2 Sticks | 1 Chunk (the chunk it's in) |
-| Stone | 1 Stone Spear + 2 Sticks | 1 Chunk + 1 Radius (the chunk it's in + all 8 surrounding chunks) |
-| Copper | 1 Copper Spear + 2 Sticks | 1 Chunk + 2 Radius |
-| Iron | 1 Iron Spear + 2 Sticks | 1 Chunk + 4 Radius |
-| Golden | 1 Golden Spear + 2 Sticks | 1 Chunk + 6 Radius |
-| Diamond | 1 Diamond Spear + 2 Sticks | 1 Chunk + 8 Radius |
-| Netherite | 1 Netherite Spear + 2 Sticks | 1 Chunk + 16 Radius |
+| Wooden | 1 Wooden Spear + 2 Sticks | N/A |
+| Stone | 1 Stone Spear + 2 Sticks | 1 Cobblestone + 1 Wooden Pike + 1 Stick |
+| Copper | 1 Copper Spear + 2 Sticks | 1 Copper Ingot + 1 Stone Pike + 1 Stick |
+| Iron | 1 Iron Spear + 2 Sticks | 1 Iron Ingot + 1 Copper Pike + 1 Stick |
+| Golden | 1 Golden Spear + 2 Sticks | 1 Gold Ingot + 1 Iron Pike + 1 Stick |
+| Diamond | 1 Diamond Spear + 2 Sticks | 1 Diamond + 1 Golden Pike + 1 Stick |
+| Netherite | 1 Netherite Spear + 2 Sticks | Smithing Table: 1 Netherite Upgrade + 1 Diamond Pike + 1 Netherite Ingot |
 
 ## Notes
 
@@ -57,7 +69,6 @@ Inactive (left) and Active (right) Diamond Pikes
 - When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 
 ## Upcoming Features
-- Recipes to turn lower-tier pikes into higher-tier ones (wooden pike + 1 cobblestone + 1 stick = stone pike or similar)
 - Size all valid blocks placed on top to be "head sized" (since non-heads look bad covering the whole top of the pike)
 - Visual cues/UI/display to show what mob is being prevented
 - JEI integration (or similar, maybe a guidebook) to show what blocks will prevent which mobs

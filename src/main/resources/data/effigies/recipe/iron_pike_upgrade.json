@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "M",
+    "P",
+    "|"
+  ],
+  "key": {
+    "M": "minecraft:iron_ingot",
+    "P": "effigies:copper_pike",
+    "|": "minecraft:stick"
+  },
+  "result": {
+    "id": "effigies:iron_pike"
+  }
+}
