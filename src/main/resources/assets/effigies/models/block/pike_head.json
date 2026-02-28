@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "cutout",
+  "textures": {
+    "particle": "minecraft:block/bone_block_side"
+  }
+}

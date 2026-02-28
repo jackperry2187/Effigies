@@ -29,6 +29,8 @@ Effigies supports multiple Minecraft versions and mod loaders:
         - Supports vanilla definitions, such as `minecraft:sand=minecraft:zombie` to make sand prevent zombie spawns
         - Also supports modded definitions, such as `ecologics:coconut_planks=ecologics:penguin` to make coconut planks prevent penguin spawns
         - Also supports multiple references, so adding both `minecraft:sand=minecraft:zombie` and `minecraft:zombie_head=minecraft:zombie` would mean either sand or a zombie head would work as intended!
+        - Any blocks that are defined as Pike Heads (sand or coconut planks from the above examples) will be automatically scaled to the size of a mob head when placed on a pike, to make sure that any custom blocks looks decent on the Pike
+        - Invalid blocks (ones not in the config file) that are placed on top will not be downscaled
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
 - Breaking a Pike will drop both the Pike block and the head (if activated)
 - Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
@@ -69,6 +71,5 @@ Inactive (left) and Active (right) Diamond Pikes
 - When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 
 ## Upcoming Features
-- Size all valid blocks placed on top to be "head sized" (since non-heads look bad covering the whole top of the pike)
 - Visual cues/UI/display to show what mob is being prevented
 - JEI integration (or similar, maybe a guidebook) to show what blocks will prevent which mobs

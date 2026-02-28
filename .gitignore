@@ -26,6 +26,7 @@ versions/*/build/tmp/
 versions/*/build/devlibs/
 versions/*/build/processIncludeJars/
 versions/*/build/resources/
+mappings/*
 
 # IDE files
 .cursor/

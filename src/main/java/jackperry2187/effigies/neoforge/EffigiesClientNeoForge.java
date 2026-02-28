@@ -2,12 +2,15 @@
 /*package jackperry2187.effigies.neoforge;
 
 import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.client.PikeHeadBlockEntityRenderer;
 import jackperry2187.effigies.item.PikeItem;
+import jackperry2187.effigies.registry.ModBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @EventBusSubscriber(modid = Effigies.MOD_ID, value = Dist.CLIENT)
@@ -29,6 +32,10 @@ public class EffigiesClientNeoForge {
             }
             event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
         }
+    }
+
+    public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlockEntities.pikeHead(), PikeHeadBlockEntityRenderer::new);
     }
 }
 *///?}

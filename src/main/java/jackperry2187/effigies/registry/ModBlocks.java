@@ -3,6 +3,7 @@ package jackperry2187.effigies.registry;
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
 import jackperry2187.effigies.block.PikeBlock;
+import jackperry2187.effigies.block.PikeHeadBlock;
 //? if fabric {
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
@@ -27,6 +28,7 @@ public final class ModBlocks {
     private static Block GOLDEN_PIKE;
     private static Block DIAMOND_PIKE;
     private static Block NETHERITE_PIKE;
+    private static Block PIKE_HEAD;
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
@@ -49,6 +51,9 @@ public final class ModBlocks {
 
         Identifier netheritePikeId = Effigies.id("netherite_pike");
         NETHERITE_PIKE = Registry.register(Registries.BLOCK, netheritePikeId, new PikeBlock(PikeTier.NETHERITE, netheritePikeId));
+
+        Identifier pikeHeadId = Effigies.id("pike_head");
+        PIKE_HEAD = Registry.register(Registries.BLOCK, pikeHeadId, new PikeHeadBlock(pikeHeadId));
     }
 
     public static Block woodenPike() {
@@ -78,6 +83,10 @@ public final class ModBlocks {
     public static Block netheritePike() {
         return NETHERITE_PIKE;
     }
+
+    public static Block pikeHead() {
+        return PIKE_HEAD;
+    }
     //?} else {
     /*public static final DeferredRegister.Blocks BLOCKS =
         DeferredRegister.createBlocks(Effigies.MOD_ID);
@@ -96,6 +105,8 @@ public final class ModBlocks {
         BLOCKS.register("diamond_pike", () -> new PikeBlock(PikeTier.DIAMOND, PikeTier.DIAMOND.blockProperties(Effigies.MOD_ID, "diamond_pike")));
     public static final DeferredBlock<PikeBlock> NETHERITE_PIKE =
         BLOCKS.register("netherite_pike", () -> new PikeBlock(PikeTier.NETHERITE, PikeTier.NETHERITE.blockProperties(Effigies.MOD_ID, "netherite_pike")));
+    public static final DeferredBlock<PikeHeadBlock> PIKE_HEAD =
+        BLOCKS.register("pike_head", () -> new PikeHeadBlock(PikeHeadBlock.neoForgeProperties()));
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
@@ -127,6 +138,10 @@ public final class ModBlocks {
 
     public static Block netheritePike() {
         return NETHERITE_PIKE.get();
+    }
+
+    public static Block pikeHead() {
+        return PIKE_HEAD.get();
     }
     *///?}
 }

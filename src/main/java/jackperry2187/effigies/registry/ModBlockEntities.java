@@ -2,6 +2,7 @@ package jackperry2187.effigies.registry;
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
+import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 //? if fabric {
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
@@ -21,6 +22,7 @@ public final class ModBlockEntities {
 
     //? if fabric {
     private static BlockEntityType<PikeBlockEntity> PIKE;
+    private static BlockEntityType<PikeHeadBlockEntity> PIKE_HEAD;
 
     public static void register() {
         PIKE = Registry.register(
@@ -36,10 +38,21 @@ public final class ModBlockEntities {
                 ModBlocks.netheritePike()
             ).build()
         );
+        PIKE_HEAD = Registry.register(
+            Registries.BLOCK_ENTITY_TYPE,
+            Effigies.id("pike_head"),
+            FabricBlockEntityTypeBuilder.create(PikeHeadBlockEntity::new,
+                ModBlocks.pikeHead()
+            ).build()
+        );
     }
 
     public static BlockEntityType<PikeBlockEntity> pike() {
         return PIKE;
+    }
+
+    public static BlockEntityType<PikeHeadBlockEntity> pikeHead() {
+        return PIKE_HEAD;
     }
     //?} else {
     /*public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
@@ -59,12 +72,24 @@ public final class ModBlockEntities {
             )
         );
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PikeHeadBlockEntity>> PIKE_HEAD =
+        BLOCK_ENTITIES.register(
+            "pike_head",
+            () -> new BlockEntityType<>(PikeHeadBlockEntity::new,
+                ModBlocks.pikeHead()
+            )
+        );
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }
 
     public static BlockEntityType<PikeBlockEntity> pike() {
         return PIKE.get();
+    }
+
+    public static BlockEntityType<PikeHeadBlockEntity> pikeHead() {
+        return PIKE_HEAD.get();
     }
     *///?}
 }

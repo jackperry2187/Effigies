@@ -1,6 +1,7 @@
 package jackperry2187.effigies.block.entity;
 
 import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.block.PikeHeadBlock;
 import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.registry.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 //?} else {
 /*import net.neoforged.fml.ModList;
 import net.minecraft.core.BlockPos;
@@ -26,6 +28,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,7 +48,7 @@ public class PikeBlockEntity extends BlockEntity {
     }
 
     public static boolean isValidHeadBlock(BlockState state) {
-        return getHeadTypeFromBlockState(state) != null;
+        return state.getBlock() instanceof PikeHeadBlock;
     }
 
     @Nullable
@@ -107,6 +110,29 @@ public class PikeBlockEntity extends BlockEntity {
         *///?}
         return resolveEntityType(blockId);
     }
+
+    /**
+     * Resolves the entity type from a PikeHeadBlockEntity at the given position.
+     * Used when the head above a pike is a PikeHeadBlock that stores the original block ID.
+     */
+    @Nullable
+    //? if fabric {
+    public static EntityType<?> getHeadTypeFromWorld(World world, BlockPos headPos) {
+        BlockEntity be = world.getBlockEntity(headPos);
+        if (!(be instanceof PikeHeadBlockEntity pikeHead)) return null;
+        String storedBlockId = pikeHead.getStoredBlockId();
+        if (storedBlockId == null || storedBlockId.isEmpty()) return null;
+        return resolveEntityType(storedBlockId);
+    }
+    //?} else {
+    /*public static EntityType<?> getHeadTypeFromWorld(Level level, BlockPos headPos) {
+        BlockEntity be = level.getBlockEntity(headPos);
+        if (!(be instanceof PikeHeadBlockEntity pikeHead)) return null;
+        String storedBlockId = pikeHead.getStoredBlockId();
+        if (storedBlockId == null || storedBlockId.isEmpty()) return null;
+        return resolveEntityType(storedBlockId);
+    }
+    *///?}
 
     /**
      * Resolves a block ID to its mapped EntityType via config, or null if not configured

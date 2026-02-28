@@ -12,8 +12,10 @@ import jackperry2187.effigies.registry.ModBlocks;
 import jackperry2187.effigies.registry.ModCreativeTabs;
 import jackperry2187.effigies.registry.ModItems;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -37,7 +39,10 @@ public class EffigiesNeoForge {
 
         NeoForge.EVENT_BUS.register(SpawnPreventionHandler.class);
 
-        // Register config sync networking
+        if (FMLLoader.getCurrent().getDist() == Dist.CLIENT) {
+            modBus.addListener(EffigiesClientNeoForge::onRegisterRenderers);
+        }
+
         modBus.addListener(EffigiesNeoForge::onRegisterPayloads);
         NeoForge.EVENT_BUS.addListener(EffigiesNeoForge::onPlayerJoin);
         NeoForge.EVENT_BUS.addListener(EffigiesNeoForge::onServerStarting);
