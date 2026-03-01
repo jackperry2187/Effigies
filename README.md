@@ -29,8 +29,10 @@ Effigies supports multiple Minecraft versions and mod loaders:
         - Supports vanilla definitions, such as `minecraft:sand=minecraft:zombie` to make sand prevent zombie spawns
         - Also supports modded definitions, such as `ecologics:coconut_planks=ecologics:penguin` to make coconut planks prevent penguin spawns
         - Also supports multiple references, so adding both `minecraft:sand=minecraft:zombie` and `minecraft:zombie_head=minecraft:zombie` would mean either sand or a zombie head would work as intended!
+        - Does NOT support a single block preventing spawns of multiple mobs, so having `minecraft:sand=minecraft:zombie` and on the next line having `minecraft:sand=minecraft:skeleton` would make sand ONLY prevent skeletons
         - Any blocks that are defined as Pike Heads (sand or coconut planks from the above examples) will be automatically scaled to the size of a mob head when placed on a pike, to make sure that any custom blocks looks decent on the Pike
         - Invalid blocks (ones not in the config file) that are placed on top will not be downscaled
+    - When the player looks at an activated Pike, the mob it is currently preventing will hover on top of the Pike
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
 - Breaking a Pike will drop both the Pike block and the head (if activated)
 - Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
@@ -38,6 +40,12 @@ Effigies supports multiple Minecraft versions and mod loaders:
 ## In-Game Example
 Inactive (left) and Active (right) Diamond Pikes
 ![Inactive and Active Example](https://cdn.modrinth.com/data/cached_images/f3d95544b107234a0887d37170aa2ee0321cbe91.png)
+
+Examples of Random Blocks Being Correctly Head-Sized
+![Downsized Examples](https://cdn.modrinth.com/data/cached_images/c46ccaaa9e00676da057c8c408ed73717d0ffe36_0.webp)
+
+Examples of Hovering Over an Active Pike
+![Hovering Examples](https://cdn.modrinth.com/data/cached_images/93fc0d928134d9b3350cbd16153c4bd7ec8078b1.png)
 
 ## Pike Table
 
@@ -71,5 +79,4 @@ Inactive (left) and Active (right) Diamond Pikes
 - When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 
 ## Upcoming Features
-- Visual cues/UI/display to show what mob is being prevented
 - JEI integration (or similar, maybe a guidebook) to show what blocks will prevent which mobs
