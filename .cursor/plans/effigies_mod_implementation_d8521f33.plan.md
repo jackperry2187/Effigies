@@ -41,6 +41,7 @@ todos:
     dependencies:
       - platform-entries
       - resources
+isProject: false
 ---
 
 # Effigies Mod Implementation Plan
@@ -76,6 +77,8 @@ flowchart TB
     PikeBlock --> PikeTier
     SpawnHandler --> PikeBlockEntity
 ```
+
+
 
 ## Phase 1: Fix Existing Configuration Issues
 
@@ -142,7 +145,7 @@ public enum PikeTier {
 
 ### Block Models (cross shape like sugar cane)
 
-**`assets/effigies/models/block/pike_wooden.json`**:
+`**assets/effigies/models/block/pike_wooden.json**`:
 
 ```json
 {
@@ -153,7 +156,7 @@ public enum PikeTier {
 
 ### Blockstates
 
-**`assets/effigies/blockstates/wooden_pike.json`**:
+`**assets/effigies/blockstates/wooden_pike.json**`:
 
 ```json
 {
@@ -163,7 +166,7 @@ public enum PikeTier {
 
 ### Item Models
 
-**`assets/effigies/models/item/wooden_pike.json`**:
+`**assets/effigies/models/item/wooden_pike.json**`:
 
 ```json
 {
@@ -173,7 +176,7 @@ public enum PikeTier {
 
 ### Language File
 
-**`assets/effigies/lang/en_us.json`**:
+`**assets/effigies/lang/en_us.json**`:
 
 ```json
 {
@@ -232,3 +235,4 @@ src/main/resources/assets/effigies/
 └── lang/
     └── en_us.json
 ```
+

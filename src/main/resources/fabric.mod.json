@@ -20,6 +20,9 @@
         ],
         "client": [
             "jackperry2187.effigies.fabric.EffigiesClientFabric"
+        ],
+        "jei_mod_plugin": [
+            "jackperry2187.effigies.compat.jei.EffigiesJeiPlugin"
         ]
     },
     "mixins": [],
@@ -29,5 +32,7 @@
         "java": ">=${java_version}",
         "fabric-api": "*"
     },
-    "suggests": {}
+    "suggests": {
+        "jei": "*"
+    }
 }

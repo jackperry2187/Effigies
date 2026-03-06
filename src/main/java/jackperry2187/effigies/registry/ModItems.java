@@ -3,6 +3,9 @@ package jackperry2187.effigies.registry;
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
 import jackperry2187.effigies.item.PikeItem;
+
+import java.util.List;
+
 //? if fabric {
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -73,6 +76,13 @@ public final class ModItems {
                 .registryKey(RegistryKey.of(RegistryKeys.ITEM, netheritePikeId))
                 .useBlockPrefixedTranslationKey(), PikeTier.NETHERITE));
     }
+
+    public static List<Item> getAllPikeItems() {
+        return List.of(
+            WOODEN_PIKE, STONE_PIKE, COPPER_PIKE, IRON_PIKE,
+            GOLDEN_PIKE, DIAMOND_PIKE, NETHERITE_PIKE
+        );
+    }
     //?} else {
     /*public static final DeferredRegister.Items ITEMS =
         DeferredRegister.createItems(Effigies.MOD_ID);
@@ -94,6 +104,13 @@ public final class ModItems {
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
+    }
+
+    public static List<Item> getAllPikeItems() {
+        return List.of(
+            WOODEN_PIKE.get(), STONE_PIKE.get(), COPPER_PIKE.get(), IRON_PIKE.get(),
+            GOLDEN_PIKE.get(), DIAMOND_PIKE.get(), NETHERITE_PIKE.get()
+        );
     }
     *///?}
 }

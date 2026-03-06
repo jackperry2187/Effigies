@@ -10,6 +10,7 @@ versions/*/build/
 versions/*/bin/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+!libs/*.jar
 *.class
 
 # Stonecutter cache

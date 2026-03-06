@@ -47,6 +47,12 @@ Examples of Random Blocks Being Correctly Head-Sized
 Examples of Hovering Over an Active Pike
 ![Hovering Examples](https://cdn.modrinth.com/data/cached_images/93fc0d928134d9b3350cbd16153c4bd7ec8078b1.png)
 
+Examples of Modded (Penguin from Ecologics) and Normal (Skeleton) mobs in JEI
+![JEI Examples 1](https://cdn.modrinth.com/data/cached_images/d5822186d72e1d5f7cb12721b9a853c11524059f_0.webp)
+
+Examples of Large (Iron Golem) and Small (Axolotl) mobs in JEI
+![JEI Examples 2](https://cdn.modrinth.com/data/cached_images/477154b4c84c5e5626e16889c0ff576105ab3a8d.png)
+
 ## Pike Table
 
 | Tier | Default Area of Effect |
@@ -61,7 +67,7 @@ Examples of Hovering Over an Active Pike
 
 ## Recipes
 
-| Tier | Recipe | "Upgrade" Recipe |
+| Tier | Recipe | Upgrade Recipe |
 | ---- | ------ | -------------- | 
 | Wooden | 1 Wooden Spear + 2 Sticks | N/A |
 | Stone | 1 Stone Spear + 2 Sticks | 1 Cobblestone + 1 Wooden Pike + 1 Stick |
@@ -77,6 +83,7 @@ Examples of Hovering Over an Active Pike
 - Multiple Pikes with different heads can be used to prevent multiple mob types from spawning within the radius
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
 - When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
+- Supports JEI 27.4.0.15 or Newer!
 
 ## Upcoming Features
-- JEI integration (or similar, maybe a guidebook) to show what blocks will prevent which mobs
+- Non-JEI guidebook or similar to show what block will prevent which mobs

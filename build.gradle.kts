@@ -46,6 +46,7 @@ repositories {
     maven("https://maven.fabricmc.net/")
     maven("https://maven.architectury.dev/")
     maven("https://maven.neoforged.net/releases/")
+    maven("https://maven.blamejared.com/")
 }
 
 val fabricLoaderVersion = "0.18.4"
@@ -54,6 +55,8 @@ val yarnMappings = "1.21.11+build.4"
 
 val neoforgeVersion = "21.11.35-beta"
 
+val jeiVersion = "27.4.0.15"
+
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
     
@@ -61,10 +64,13 @@ dependencies {
         mappings("net.fabricmc:yarn:$yarnMappings:v2")
         modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
         modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+        modCompileOnly(files(rootProject.file("libs/jei-$minecraftVersion-common-api-intermediary-$jeiVersion.jar")))
+        modCompileOnly(files(rootProject.file("libs/jei-$minecraftVersion-fabric-api-$jeiVersion.jar")))
     } else {
         mappings(loom.layered {
             officialMojangMappings()
         })
+        compileOnly("mezz.jei:jei-$minecraftVersion-neoforge-api:$jeiVersion")
     }
 }
 
