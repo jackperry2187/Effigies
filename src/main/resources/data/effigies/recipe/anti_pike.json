@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S",
+    "|",
+    "|"
+  ],
+  "key": {
+    "S": "effigies:anti_spear",
+    "|": "minecraft:breeze_rod"
+  },
+  "result": {
+    "id": "effigies:anti_pike"
+  }
+}
+  

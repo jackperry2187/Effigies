@@ -2,6 +2,7 @@ package jackperry2187.effigies;
 
 import jackperry2187.effigies.block.PikeBlock;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
+import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 import jackperry2187.effigies.config.ConfigSettings;
 import org.jetbrains.annotations.Nullable;
 
@@ -231,10 +232,25 @@ public final class PikeRegistry {
             if (!state.get(PikeBlock.ACTIVATED)) {
                 continue;
             }
-            // Get the entity type from the head above
-            // The head is in the same chunk (only Y differs), so use chunk.getBlockState()
-            BlockState headState = chunk.getBlockState(pos.up());
-            EntityType<?> entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+            BlockPos headPos = pos.up();
+            EntityType<?> entityType = null;
+
+            // The head above is a PikeHeadBlock that stores the original block ID
+            // in its block entity — resolve entity type from that stored data
+            BlockEntity headBe = chunk.getBlockEntity(headPos);
+            if (headBe instanceof PikeHeadBlockEntity pikeHead) {
+                BlockState storedState = pikeHead.getStoredBlockState();
+                if (storedState != null) {
+                    entityType = PikeBlockEntity.getHeadTypeFromBlockState(storedState);
+                }
+            }
+
+            // Fallback: direct block state lookup (for any non-PikeHeadBlock heads)
+            if (entityType == null) {
+                BlockState headState = chunk.getBlockState(headPos);
+                entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+            }
+
             if (entityType == null) {
                 continue;
             }
@@ -258,10 +274,25 @@ public final class PikeRegistry {
             if (!state.getValue(PikeBlock.ACTIVATED)) {
                 continue;
             }
-            // Get the entity type from the head above
-            // The head is in the same chunk (only Y differs), so use chunk.getBlockState()
-            BlockState headState = chunk.getBlockState(pos.above());
-            EntityType<?> entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+            BlockPos headPos = pos.above();
+            EntityType<?> entityType = null;
+
+            // The head above is a PikeHeadBlock that stores the original block ID
+            // in its block entity — resolve entity type from that stored data
+            BlockEntity headBe = chunk.getBlockEntity(headPos);
+            if (headBe instanceof PikeHeadBlockEntity pikeHead) {
+                BlockState storedState = pikeHead.getStoredBlockState();
+                if (storedState != null) {
+                    entityType = PikeBlockEntity.getHeadTypeFromBlockState(storedState);
+                }
+            }
+
+            // Fallback: direct block state lookup (for any non-PikeHeadBlock heads)
+            if (entityType == null) {
+                BlockState headState = chunk.getBlockState(headPos);
+                entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
+            }
+
             if (entityType == null) {
                 continue;
             }

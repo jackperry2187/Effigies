@@ -4,7 +4,9 @@ package jackperry2187.effigies.fabric;
 import jackperry2187.effigies.client.PikeHeadBlockEntityRenderer;
 import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.config.ConfigSyncPayload;
+import jackperry2187.effigies.item.AntiSpearItem;
 import jackperry2187.effigies.item.PikeItem;
+import jackperry2187.effigies.registry.ModBlocks;
 import jackperry2187.effigies.registry.ModBlockEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
@@ -37,6 +39,14 @@ public class EffigiesClientFabric implements ClientModInitializer {
                         lines.add(Text.translatable("item.effigies.pike.tooltip.chunk_radius", radius).formatted(Formatting.GRAY));
                     }
                 }
+                lines.add(Text.translatable("item.effigies.pike.tooltip.activate").formatted(Formatting.DARK_GRAY));
+            }
+            if (stack.getItem() instanceof AntiSpearItem) {
+                lines.add(Text.translatable("item.effigies.anti_spear.tooltip").formatted(Formatting.DARK_PURPLE));
+            }
+            if (stack.isOf(ModBlocks.antiPike().asItem())) {
+                lines.add(Text.translatable("item.effigies.anti_pike.tooltip.spawns").formatted(Formatting.DARK_PURPLE));
+                lines.add(Text.translatable("item.effigies.anti_pike.tooltip.bypass").formatted(Formatting.RED));
                 lines.add(Text.translatable("item.effigies.pike.tooltip.activate").formatted(Formatting.DARK_GRAY));
             }
         });

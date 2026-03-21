@@ -2,6 +2,7 @@ package jackperry2187.effigies.registry;
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
+import jackperry2187.effigies.block.AntiPikeBlock;
 import jackperry2187.effigies.block.PikeBlock;
 import jackperry2187.effigies.block.PikeHeadBlock;
 //? if fabric {
@@ -29,6 +30,7 @@ public final class ModBlocks {
     private static Block DIAMOND_PIKE;
     private static Block NETHERITE_PIKE;
     private static Block PIKE_HEAD;
+    private static Block ANTI_PIKE;
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
@@ -54,6 +56,9 @@ public final class ModBlocks {
 
         Identifier pikeHeadId = Effigies.id("pike_head");
         PIKE_HEAD = Registry.register(Registries.BLOCK, pikeHeadId, new PikeHeadBlock(pikeHeadId));
+
+        Identifier antiPikeId = Effigies.id("anti_pike");
+        ANTI_PIKE = Registry.register(Registries.BLOCK, antiPikeId, new AntiPikeBlock(antiPikeId));
     }
 
     public static Block woodenPike() {
@@ -87,6 +92,10 @@ public final class ModBlocks {
     public static Block pikeHead() {
         return PIKE_HEAD;
     }
+
+    public static Block antiPike() {
+        return ANTI_PIKE;
+    }
     //?} else {
     /*public static final DeferredRegister.Blocks BLOCKS =
         DeferredRegister.createBlocks(Effigies.MOD_ID);
@@ -107,6 +116,8 @@ public final class ModBlocks {
         BLOCKS.register("netherite_pike", () -> new PikeBlock(PikeTier.NETHERITE, PikeTier.NETHERITE.blockProperties(Effigies.MOD_ID, "netherite_pike")));
     public static final DeferredBlock<PikeHeadBlock> PIKE_HEAD =
         BLOCKS.register("pike_head", () -> new PikeHeadBlock(PikeHeadBlock.neoForgeProperties()));
+    public static final DeferredBlock<AntiPikeBlock> ANTI_PIKE =
+        BLOCKS.register("anti_pike", () -> new AntiPikeBlock(AntiPikeBlock.neoForgeProperties()));
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
@@ -142,6 +153,10 @@ public final class ModBlocks {
 
     public static Block pikeHead() {
         return PIKE_HEAD.get();
+    }
+
+    public static Block antiPike() {
+        return ANTI_PIKE.get();
     }
     *///?}
 }

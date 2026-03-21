@@ -42,6 +42,8 @@ public final class ModCreativeTabs {
                     entries.add(ModBlocks.goldenPike());
                     entries.add(ModBlocks.diamondPike());
                     entries.add(ModBlocks.netheritePike());
+                    entries.add(ModItems.antiSpear());
+                    entries.add(ModBlocks.antiPike());
                 })
                 .build()
         );
@@ -66,6 +68,8 @@ public final class ModCreativeTabs {
                 output.accept(ModBlocks.goldenPike());
                 output.accept(ModBlocks.diamondPike());
                 output.accept(ModBlocks.netheritePike());
+                output.accept(ModItems.antiSpear());
+                output.accept(ModBlocks.antiPike());
             })
             .build()
         );

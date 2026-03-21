@@ -38,6 +38,23 @@ public final class SpawnPreventionHandler {
     private SpawnPreventionHandler() {
     }
 
+    private static boolean antiPikeBypass = false;
+
+    /**
+     * Enables the bypass flag so the next entity spawn is not blocked by pikes.
+     * Must be called on the server thread before spawning an entity from an Anti-Pike.
+     */
+    public static void enableAntiPikeBypass() {
+        antiPikeBypass = true;
+    }
+
+    /**
+     * Disables the bypass flag after spawning completes.
+     */
+    public static void disableAntiPikeBypass() {
+        antiPikeBypass = false;
+    }
+
     //? if fabric {
     public static void registerFabric() {
         // Register mob spawn prevention
@@ -121,6 +138,10 @@ public final class SpawnPreventionHandler {
 
     //? if fabric {
     private static boolean isSpawnBlocked(ServerWorld level, BlockPos spawnPos, EntityType<?> entityType) {
+        if (antiPikeBypass) {
+            return false;
+        }
+
         // Use the efficient pike registry for spawn checking
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         
@@ -162,6 +183,10 @@ public final class SpawnPreventionHandler {
     }
     //?} else {
     /*private static boolean isSpawnBlocked(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
+        if (antiPikeBypass) {
+            return false;
+        }
+
         // Use the efficient pike registry for spawn checking
         PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
         

@@ -6,11 +6,16 @@
   "block.effigies.golden_pike": "Golden Pike",
   "block.effigies.diamond_pike": "Diamond Pike",
   "block.effigies.netherite_pike": "Netherite Pike",
+  "block.effigies.anti_pike": "Anti-Pike",
+  "item.effigies.anti_spear": "Anti-Spear",
   "itemGroup.effigies": "Effigies",
   "item.effigies.pike.tooltip.disabled": "Does not prevent mob spawns [Disabled by Config].",
   "item.effigies.pike.tooltip.prevents_spawns": "Prevents mob spawns in",
   "item.effigies.pike.tooltip.chunk_only": "the chunk it's in.",
   "item.effigies.pike.tooltip.chunk_radius": "the chunk it's in + %s chunk radius.",
   "item.effigies.pike.tooltip.activate": "Activate with a mob head.",
-  "effigies.jei.pike_prevention": "Pike Mob Prevention"
+  "item.effigies.anti_spear.tooltip": "Forged beyond netherite.",
+  "item.effigies.anti_pike.tooltip.spawns": "Spawns mobs matching the placed head.",
+  "item.effigies.anti_pike.tooltip.bypass": "Spawned mobs cannot be prevented by pikes.",
+  "effigies.jei.pike_prevention": "Pike Heads"
 }

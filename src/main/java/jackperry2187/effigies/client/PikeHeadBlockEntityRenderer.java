@@ -1,5 +1,6 @@
 package jackperry2187.effigies.client;
 
+import jackperry2187.effigies.block.AntiPikeBlock;
 import jackperry2187.effigies.block.PikeBlock;
 import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 import jackperry2187.effigies.config.ConfigSettings;
@@ -146,7 +147,9 @@ public class PikeHeadBlockEntityRenderer
 
         BlockPos pikePos = entity.getPos().down();
         BlockState pikeState = world.getBlockState(pikePos);
-        if (!(pikeState.getBlock() instanceof PikeBlock) || !pikeState.get(PikeBlock.ACTIVATED)) return;
+        boolean isPikeActivated = (pikeState.getBlock() instanceof PikeBlock && pikeState.get(PikeBlock.ACTIVATED))
+            || (pikeState.getBlock() instanceof AntiPikeBlock && pikeState.get(AntiPikeBlock.ACTIVATED));
+        if (!isPikeActivated) return;
 
         String storedBlockId = entity.getStoredBlockId();
         if (storedBlockId == null || storedBlockId.isEmpty()) return;
@@ -309,7 +312,9 @@ public class PikeHeadBlockEntityRenderer
 
         BlockPos pikePos = entity.getBlockPos().below();
         BlockState pikeState = level.getBlockState(pikePos);
-        if (!(pikeState.getBlock() instanceof PikeBlock) || !pikeState.getValue(PikeBlock.ACTIVATED)) return;
+        boolean isPikeActivated = (pikeState.getBlock() instanceof PikeBlock && pikeState.getValue(PikeBlock.ACTIVATED))
+            || (pikeState.getBlock() instanceof AntiPikeBlock && pikeState.getValue(AntiPikeBlock.ACTIVATED));
+        if (!isPikeActivated) return;
 
         String storedBlockId = entity.getStoredBlockId();
         if (storedBlockId == null || storedBlockId.isEmpty()) return;

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " PD",
+    " | ",
+    "S| "
+  ],
+  "key": {
+    "D": "minecraft:dragon_breath",
+    "P": "effigies:netherite_pike",
+    "S": "minecraft:nether_star",
+    "|": "minecraft:breeze_rod"
+  },
+  "result": {
+    "id": "effigies:anti_pike"
+  }
+}

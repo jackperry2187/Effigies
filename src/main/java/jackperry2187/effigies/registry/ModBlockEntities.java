@@ -1,6 +1,7 @@
 package jackperry2187.effigies.registry;
 
 import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.block.entity.AntiPikeBlockEntity;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 //? if fabric {
@@ -23,6 +24,7 @@ public final class ModBlockEntities {
     //? if fabric {
     private static BlockEntityType<PikeBlockEntity> PIKE;
     private static BlockEntityType<PikeHeadBlockEntity> PIKE_HEAD;
+    private static BlockEntityType<AntiPikeBlockEntity> ANTI_PIKE;
 
     public static void register() {
         PIKE = Registry.register(
@@ -45,6 +47,13 @@ public final class ModBlockEntities {
                 ModBlocks.pikeHead()
             ).build()
         );
+        ANTI_PIKE = Registry.register(
+            Registries.BLOCK_ENTITY_TYPE,
+            Effigies.id("anti_pike"),
+            FabricBlockEntityTypeBuilder.create(AntiPikeBlockEntity::new,
+                ModBlocks.antiPike()
+            ).build()
+        );
     }
 
     public static BlockEntityType<PikeBlockEntity> pike() {
@@ -53,6 +62,10 @@ public final class ModBlockEntities {
 
     public static BlockEntityType<PikeHeadBlockEntity> pikeHead() {
         return PIKE_HEAD;
+    }
+
+    public static BlockEntityType<AntiPikeBlockEntity> antiPike() {
+        return ANTI_PIKE;
     }
     //?} else {
     /*public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
@@ -80,6 +93,14 @@ public final class ModBlockEntities {
             )
         );
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AntiPikeBlockEntity>> ANTI_PIKE =
+        BLOCK_ENTITIES.register(
+            "anti_pike",
+            () -> new BlockEntityType<>(AntiPikeBlockEntity::new,
+                ModBlocks.antiPike()
+            )
+        );
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }
@@ -90,6 +111,10 @@ public final class ModBlockEntities {
 
     public static BlockEntityType<PikeHeadBlockEntity> pikeHead() {
         return PIKE_HEAD.get();
+    }
+
+    public static BlockEntityType<AntiPikeBlockEntity> antiPike() {
+        return ANTI_PIKE.get();
     }
     *///?}
 }

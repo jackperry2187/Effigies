@@ -3,7 +3,9 @@
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.client.PikeHeadBlockEntityRenderer;
+import jackperry2187.effigies.item.AntiSpearItem;
 import jackperry2187.effigies.item.PikeItem;
+import jackperry2187.effigies.registry.ModBlocks;
 import jackperry2187.effigies.registry.ModBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -30,6 +32,14 @@ public class EffigiesClientNeoForge {
                     event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.chunk_radius", radius).withStyle(ChatFormatting.GRAY));
                 }
             }
+            event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
+        }
+        if (event.getItemStack().getItem() instanceof AntiSpearItem) {
+            event.getToolTip().add(Component.translatable("item.effigies.anti_spear.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
+        }
+        if (event.getItemStack().is(ModBlocks.antiPike().asItem())) {
+            event.getToolTip().add(Component.translatable("item.effigies.anti_pike.tooltip.spawns").withStyle(ChatFormatting.DARK_PURPLE));
+            event.getToolTip().add(Component.translatable("item.effigies.anti_pike.tooltip.bypass").withStyle(ChatFormatting.RED));
             event.getToolTip().add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
         }
     }

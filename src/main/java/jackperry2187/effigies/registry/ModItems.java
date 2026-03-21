@@ -2,11 +2,13 @@ package jackperry2187.effigies.registry;
 
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
+import jackperry2187.effigies.item.AntiSpearItem;
 import jackperry2187.effigies.item.PikeItem;
 
 import java.util.List;
 
 //? if fabric {
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -14,7 +16,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 //?} else {
-/*import net.minecraft.world.item.Item;
+/*import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -32,6 +35,8 @@ public final class ModItems {
     private static Item GOLDEN_PIKE;
     private static Item DIAMOND_PIKE;
     private static Item NETHERITE_PIKE;
+    private static Item ANTI_SPEAR;
+    private static Item ANTI_PIKE;
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
@@ -75,13 +80,35 @@ public final class ModItems {
             new PikeItem(ModBlocks.netheritePike(), new Item.Settings()
                 .registryKey(RegistryKey.of(RegistryKeys.ITEM, netheritePikeId))
                 .useBlockPrefixedTranslationKey(), PikeTier.NETHERITE));
+
+        Identifier antiSpearId = Effigies.id("anti_spear");
+        ANTI_SPEAR = Registry.register(Registries.ITEM, antiSpearId,
+            new AntiSpearItem(new Item.Settings()
+                .registryKey(RegistryKey.of(RegistryKeys.ITEM, antiSpearId))
+                .useItemPrefixedTranslationKey()
+                .spear(AntiSpearItem.MATERIAL, 1.05f, 1.3f, 0.35f, 2.0f, 6.0f, 5.0f, 5.1f, 7.5f, 4.6f)
+                .fireproof()));
+
+        Identifier antiPikeId = Effigies.id("anti_pike");
+        ANTI_PIKE = Registry.register(Registries.ITEM, antiPikeId,
+            new BlockItem(ModBlocks.antiPike(), new Item.Settings()
+                .registryKey(RegistryKey.of(RegistryKeys.ITEM, antiPikeId))
+                .useBlockPrefixedTranslationKey()));
     }
 
     public static List<Item> getAllPikeItems() {
         return List.of(
             WOODEN_PIKE, STONE_PIKE, COPPER_PIKE, IRON_PIKE,
-            GOLDEN_PIKE, DIAMOND_PIKE, NETHERITE_PIKE
+            GOLDEN_PIKE, DIAMOND_PIKE, NETHERITE_PIKE, ANTI_PIKE
         );
+    }
+
+    public static Item antiSpear() {
+        return ANTI_SPEAR;
+    }
+
+    public static Item antiPike() {
+        return ANTI_PIKE;
     }
     //?} else {
     /*public static final DeferredRegister.Items ITEMS =
@@ -101,6 +128,13 @@ public final class ModItems {
         ITEMS.registerItem("diamond_pike", props -> new PikeItem(ModBlocks.diamondPike(), props.useBlockDescriptionPrefix(), PikeTier.DIAMOND));
     public static final DeferredItem<PikeItem> NETHERITE_PIKE =
         ITEMS.registerItem("netherite_pike", props -> new PikeItem(ModBlocks.netheritePike(), props.useBlockDescriptionPrefix(), PikeTier.NETHERITE));
+    public static final DeferredItem<AntiSpearItem> ANTI_SPEAR =
+        ITEMS.registerItem("anti_spear", props -> new AntiSpearItem(props
+            .useItemDescriptionPrefix()
+            .spear(AntiSpearItem.MATERIAL, 1.05f, 1.3f, 0.35f, 2.0f, 6.0f, 5.0f, 5.1f, 7.5f, 4.6f)
+            .fireResistant()));
+    public static final DeferredItem<BlockItem> ANTI_PIKE =
+        ITEMS.registerItem("anti_pike", props -> new BlockItem(ModBlocks.antiPike(), props.useBlockDescriptionPrefix()));
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
@@ -109,8 +143,16 @@ public final class ModItems {
     public static List<Item> getAllPikeItems() {
         return List.of(
             WOODEN_PIKE.get(), STONE_PIKE.get(), COPPER_PIKE.get(), IRON_PIKE.get(),
-            GOLDEN_PIKE.get(), DIAMOND_PIKE.get(), NETHERITE_PIKE.get()
+            GOLDEN_PIKE.get(), DIAMOND_PIKE.get(), NETHERITE_PIKE.get(), ANTI_PIKE.get()
         );
+    }
+
+    public static Item antiSpear() {
+        return ANTI_SPEAR.get();
+    }
+
+    public static Item antiPike() {
+        return ANTI_PIKE.get();
     }
     *///?}
 }

@@ -36,6 +36,8 @@ Effigies supports multiple Minecraft versions and mod loaders:
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
 - Breaking a Pike will drop both the Pike block and the head (if activated)
 - Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
+- Also adds a new Anti-Spear which has slightly higher damage than Netherite and the same attack speed as Diamond
+- The Anti-Spear can also be used to craft the Anti-Pike which acts as a powerful mob spawner for whatever mob head is placed on it
 
 ## In-Game Example
 Inactive (left) and Active (right) Diamond Pikes
@@ -76,6 +78,8 @@ Examples of Large (Iron Golem) and Small (Axolotl) mobs in JEI
 | Golden | 1 Golden Spear + 2 Sticks | 1 Gold Ingot + 1 Iron Pike + 1 Stick |
 | Diamond | 1 Diamond Spear + 2 Sticks | 1 Diamond + 1 Golden Pike + 1 Stick |
 | Netherite | 1 Netherite Spear + 2 Sticks | Smithing Table: 1 Netherite Upgrade + 1 Diamond Pike + 1 Netherite Ingot |
+| Anti-Spear | 1 Nether Star + 1 Netherite Spear + 1 Dragon Breath | N/A |
+| Anti-Pike | 1 Anti-Spear + 2 Breeze Rods | 1 Netherite Pike + 2 Breeze Rods + 1 Nether Star + 1 Dragon Breath | 
 
 ## Notes
 

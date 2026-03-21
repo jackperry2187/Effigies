@@ -1,0 +1,7 @@
+{
+  "variants": {
+      "activated=false": { "model": "effigies:block/anti_pike" },
+      "activated=true": { "model": "effigies:block/anti_pike" }
+  }
+}
+  
