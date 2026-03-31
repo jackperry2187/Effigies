@@ -44,6 +44,7 @@ public final class ModCreativeTabs {
                     entries.add(ModBlocks.netheritePike());
                     entries.add(ModItems.antiSpear());
                     entries.add(ModBlocks.antiPike());
+                    entries.add(ModItems.grimoire());
                 })
                 .build()
         );
@@ -70,6 +71,7 @@ public final class ModCreativeTabs {
                 output.accept(ModBlocks.netheritePike());
                 output.accept(ModItems.antiSpear());
                 output.accept(ModBlocks.antiPike());
+                output.accept(ModItems.grimoire());
             })
             .build()
         );

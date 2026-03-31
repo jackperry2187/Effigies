@@ -1,6 +1,7 @@
 package jackperry2187.effigies.compat.jei;
 
 import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.client.MobRenderHelper;
 import jackperry2187.effigies.registry.ModItems;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;

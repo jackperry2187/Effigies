@@ -1,4 +1,4 @@
-package jackperry2187.effigies.compat.jei;
+package jackperry2187.effigies.client;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;

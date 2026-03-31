@@ -3,6 +3,7 @@ package jackperry2187.effigies.registry;
 import jackperry2187.effigies.Effigies;
 import jackperry2187.effigies.PikeTier;
 import jackperry2187.effigies.item.AntiSpearItem;
+import jackperry2187.effigies.item.GrimoireItem;
 import jackperry2187.effigies.item.PikeItem;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public final class ModItems {
     private static Item NETHERITE_PIKE;
     private static Item ANTI_SPEAR;
     private static Item ANTI_PIKE;
+    private static Item GRIMOIRE;
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
@@ -94,6 +96,13 @@ public final class ModItems {
             new BlockItem(ModBlocks.antiPike(), new Item.Settings()
                 .registryKey(RegistryKey.of(RegistryKeys.ITEM, antiPikeId))
                 .useBlockPrefixedTranslationKey()));
+
+        Identifier grimoireId = Effigies.id("grimoire");
+        GRIMOIRE = Registry.register(Registries.ITEM, grimoireId,
+            new GrimoireItem(new Item.Settings()
+                .registryKey(RegistryKey.of(RegistryKeys.ITEM, grimoireId))
+                .useItemPrefixedTranslationKey()
+                .maxCount(1)));
     }
 
     public static List<Item> getAllPikeItems() {
@@ -109,6 +118,10 @@ public final class ModItems {
 
     public static Item antiPike() {
         return ANTI_PIKE;
+    }
+
+    public static Item grimoire() {
+        return GRIMOIRE;
     }
     //?} else {
     /*public static final DeferredRegister.Items ITEMS =
@@ -135,6 +148,8 @@ public final class ModItems {
             .fireResistant()));
     public static final DeferredItem<BlockItem> ANTI_PIKE =
         ITEMS.registerItem("anti_pike", props -> new BlockItem(ModBlocks.antiPike(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<GrimoireItem> GRIMOIRE =
+        ITEMS.registerItem("grimoire", props -> new GrimoireItem(props.useItemDescriptionPrefix().stacksTo(1)));
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
@@ -153,6 +168,10 @@ public final class ModItems {
 
     public static Item antiPike() {
         return ANTI_PIKE.get();
+    }
+
+    public static Item grimoire() {
+        return GRIMOIRE.get();
     }
     *///?}
 }

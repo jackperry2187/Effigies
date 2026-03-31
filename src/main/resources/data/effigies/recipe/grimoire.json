@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BGB",
+    "GXG",
+    "BGB"
+  ],
+  "key": {
+    "B": "minecraft:blackstone",
+    "G": "minecraft:gilded_blackstone",
+    "X": "minecraft:book"
+  },
+  "result": {
+    "id": "effigies:grimoire"
+  }
+}

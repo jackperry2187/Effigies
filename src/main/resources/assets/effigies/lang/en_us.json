@@ -8,6 +8,7 @@
   "block.effigies.netherite_pike": "Netherite Pike",
   "block.effigies.anti_pike": "Anti-Pike",
   "item.effigies.anti_spear": "Anti-Spear",
+  "item.effigies.grimoire": "jp2187's Grimoire of Mob Prevention",
   "itemGroup.effigies": "Effigies",
   "item.effigies.pike.tooltip.disabled": "Does not prevent mob spawns [Disabled by Config].",
   "item.effigies.pike.tooltip.prevents_spawns": "Prevents mob spawns in",
@@ -17,5 +18,51 @@
   "item.effigies.anti_spear.tooltip": "Forged beyond netherite.",
   "item.effigies.anti_pike.tooltip.spawns": "Spawns mobs matching the placed head.",
   "item.effigies.anti_pike.tooltip.bypass": "Spawned mobs cannot be prevented by pikes.",
-  "effigies.jei.pike_prevention": "Pike Heads"
+  "effigies.jei.pike_prevention": "Pike Heads",
+
+  "effigies.guide.title": "Effigies Guide",
+  "effigies.guide.back": "< Back",
+
+  "effigies.guide.welcome.title": "Welcome to Effigies!",
+  "effigies.guide.welcome.body": "Effigies adds Pikes, powerful blocks that prevent hostile mob spawns in a configurable radius when activated with a mob head. It also introduces the Anti-Spear and Anti-Pike for those who seek the opposite effect.",
+  "effigies.guide.toc": "Contents",
+  "effigies.guide.toc.pikes": "> Pikes",
+  "effigies.guide.toc.heads": "> Heads",
+  "effigies.guide.toc.anti": "> Anti",
+  "effigies.guide.toc.grimoire": "> Grimoire",
+
+  "effigies.guide.pikes.title": "About Pikes",
+  "effigies.guide.pikes.body1": "Pikes are placeable blocks that, when activated with a mob head, prevent hostile mobs from spawning within a configurable chunk radius. Higher-tier pikes cover a larger area.",
+  "effigies.guide.pikes.radii": "Pike Radii:",
+  "effigies.guide.pikes.radius.disabled": "%s: Disabled",
+  "effigies.guide.pikes.radius.own_chunk": "%s: Own chunk",
+  "effigies.guide.pikes.radius.chunk": "%s: %s chunk",
+  "effigies.guide.pikes.radius.chunks": "%s: %s chunks",
+  "effigies.guide.pikes.activate": "Place a valid mob head on top of a pike to activate it.",
+
+  "effigies.guide.pike.wooden": "Wooden Pike",
+  "effigies.guide.pike.stone": "Stone Pike",
+  "effigies.guide.pike.copper": "Copper Pike",
+  "effigies.guide.pike.iron": "Iron Pike",
+  "effigies.guide.pike.golden": "Golden Pike",
+  "effigies.guide.pike.diamond": "Diamond Pike",
+  "effigies.guide.pike.netherite": "Netherite Pike",
+
+  "effigies.guide.recipe.crafting": "Crafting Recipe",
+  "effigies.guide.recipe.upgrade": "Upgrade Recipe",
+  "effigies.guide.recipe.smithing": "Smithing Recipe",
+  "effigies.guide.recipe.direct": "Direct Recipe",
+  "effigies.guide.recipe.no_upgrade": "No upgrade recipe available for this tier.",
+
+  "effigies.guide.heads.title": "About Heads",
+  "effigies.guide.heads.body": "Place a mob head on top of a pike to activate it and begin preventing spawns of the corresponding mob type within the pike's radius. The mappings between heads and mob types shown on the following pages are determined by the config file and can be customized.",
+  "effigies.guide.heads.empty": "No head-to-mob mappings configured.",
+
+  "effigies.guide.anti.spear.title": "Anti-Spear",
+  "effigies.guide.anti.spear.body": "The Anti-Spear is a weapon forged beyond netherite, crafted from a Netherite Spear, Dragon's Breath, and a Nether Star. It boasts extreme durability and high enchantability, serving as the base material for the Anti-Pike.",
+  "effigies.guide.anti.pike.title": "Anti-Pike",
+  "effigies.guide.anti.pike.body": "The Anti-Pike is the inverse of a regular Pike. When activated with a mob head, it spawns the corresponding mob nearby. Mobs spawned by an Anti-Pike bypass all pike spawn prevention, making them unstoppable sentinels.",
+
+  "effigies.guide.grimoire.title": "About This Grimoire",
+  "effigies.guide.grimoire.body": "This is the culmination of all the mob prevention (and spawning) knowledge I've gathered during my lifetime. For future generations, I wanted to make sure this vital knowledge was obtainable as many times as needed, so if you ever lose this guide, you can always craft it again."
 }

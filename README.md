@@ -38,6 +38,7 @@ Effigies supports multiple Minecraft versions and mod loaders:
 - Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
 - Also adds a new Anti-Spear which has slightly higher damage than Netherite and the same attack speed as Diamond
 - The Anti-Spear can also be used to craft the Anti-Pike which acts as a powerful mob spawner for whatever mob head is placed on it
+- Adds a convenient Grimoire which lists all the crafting recipes, radius of the Pikes, and valid mob heads
 
 ## In-Game Example
 Inactive (left) and Active (right) Diamond Pikes
@@ -54,6 +55,12 @@ Examples of Modded (Penguin from Ecologics) and Normal (Skeleton) mobs in JEI
 
 Examples of Large (Iron Golem) and Small (Axolotl) mobs in JEI
 ![JEI Examples 2](https://cdn.modrinth.com/data/cached_images/477154b4c84c5e5626e16889c0ff576105ab3a8d.png)
+
+The Grimoire shows you recipes for items which are added from Effigies
+![Grimoire Recipes](https://cdn.modrinth.com/data/cached_images/b9a557ab0b490a494eaeb9d0d7b0b36fab5ec6d5.png)
+
+And shows you which mob heads prevent which mobs!
+![Grimoire Heads](https://cdn.modrinth.com/data/cached_images/cf5ce54a13c091b5b3b353ea1beb547f5eeea94a.png)
 
 ## Pike Table
 
@@ -79,7 +86,8 @@ Examples of Large (Iron Golem) and Small (Axolotl) mobs in JEI
 | Diamond | 1 Diamond Spear + 2 Sticks | 1 Diamond + 1 Golden Pike + 1 Stick |
 | Netherite | 1 Netherite Spear + 2 Sticks | Smithing Table: 1 Netherite Upgrade + 1 Diamond Pike + 1 Netherite Ingot |
 | Anti-Spear | 1 Nether Star + 1 Netherite Spear + 1 Dragon Breath | N/A |
-| Anti-Pike | 1 Anti-Spear + 2 Breeze Rods | 1 Netherite Pike + 2 Breeze Rods + 1 Nether Star + 1 Dragon Breath | 
+| Anti-Pike | 1 Anti-Spear + 2 Breeze Rods | 1 Netherite Pike + 2 Breeze Rods + 1 Nether Star + 1 Dragon Breath |
+| Grimoire (Guide Book) | 4 Blackstone + 4 Gilded Blackstone + 1 Book | N/A | 
 
 ## Notes
 
@@ -88,6 +96,3 @@ Examples of Large (Iron Golem) and Small (Axolotl) mobs in JEI
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
 - When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 - Supports JEI 27.4.0.15 or Newer!
-
-## Upcoming Features
-- Non-JEI guidebook or similar to show what block will prevent which mobs

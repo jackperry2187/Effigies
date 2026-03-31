@@ -2,6 +2,7 @@
 /*package jackperry2187.effigies.neoforge;
 
 import jackperry2187.effigies.Effigies;
+import jackperry2187.effigies.GrimoireTracker;
 import jackperry2187.effigies.SpawnPreventionHandler;
 import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import jackperry2187.effigies.config.ConfigSettings;
@@ -11,7 +12,9 @@ import jackperry2187.effigies.registry.ModBlockEntities;
 import jackperry2187.effigies.registry.ModBlocks;
 import jackperry2187.effigies.registry.ModCreativeTabs;
 import jackperry2187.effigies.registry.ModItems;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -62,6 +65,17 @@ public class EffigiesNeoForge {
     private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             PacketDistributor.sendToPlayer(player, ConfigSyncPayload.fromCurrentConfig());
+
+            MinecraftServer server = player.level().getServer();
+            GrimoireTracker tracker = GrimoireTracker.get(server);
+            if (!tracker.hasReceivedGrimoire(player.getUUID())) {
+                ItemStack grimoire = new ItemStack(ModItems.grimoire());
+                if (!player.getInventory().add(grimoire)) {
+                    player.drop(grimoire, false);
+                }
+                tracker.markGrimoireGiven(player.getUUID());
+                Effigies.LOGGER.info("Gave grimoire to player {}", player.getName().getString());
+            }
         }
     }
 
