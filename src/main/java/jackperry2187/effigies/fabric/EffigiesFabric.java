@@ -47,7 +47,7 @@ public class EffigiesFabric implements ModInitializer {
 
             ServerPlayer player = handler.player;
             GrimoireTracker tracker = GrimoireTracker.get(server);
-            if (!tracker.hasReceivedGrimoire(player.getUUID())) {
+            if (ConfigSettings.giveGrimoireOnJoin && !tracker.hasReceivedGrimoire(player.getUUID())) {
                 ItemStack grimoire = new ItemStack(ModItems.grimoire());
                 if (!player.getInventory().add(grimoire)) {
                     player.drop(grimoire, false);

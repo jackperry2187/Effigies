@@ -32,7 +32,6 @@ public class GrimoireScreen extends Screen {
     private static final int BH = 210;
     private static final int MARGIN = 15;
     private static final int CT = 16;
-    private static final int FOOTER = 18;
     private static final int SPINE_HALF = 11;
     private static final int LP_X = MARGIN;
     private static final int RP_X = BW / 2 + SPINE_HALF;

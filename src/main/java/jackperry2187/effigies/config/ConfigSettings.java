@@ -21,6 +21,7 @@ public final class ConfigSettings {
 
     // Config values - populated from file
     public static int configVersion;
+    public static boolean giveGrimoireOnJoin;
     public static int woodenPikeRadius;
     public static int stonePikeRadius;
     public static int copperPikeRadius;
@@ -112,6 +113,7 @@ public final class ConfigSettings {
      * Called on the client when receiving the config sync packet.
      */
     public static void applySyncedValues(ConfigSyncPayload payload) {
+        giveGrimoireOnJoin = payload.giveGrimoireOnJoin();
         woodenPikeRadius = payload.woodenPikeRadius();
         stonePikeRadius = payload.stonePikeRadius();
         copperPikeRadius = payload.copperPikeRadius();
@@ -146,6 +148,7 @@ public final class ConfigSettings {
     private static void readConfigFile(Path configFile) {
         // Set defaults first in case some values are missing
         configVersion = DefaultSettings.CONFIG_VERSION;
+        giveGrimoireOnJoin = DefaultSettings.GIVE_GRIMOIRE_ON_JOIN;
         woodenPikeRadius = DefaultSettings.WOODEN_PIKE_RADIUS;
         stonePikeRadius = DefaultSettings.STONE_PIKE_RADIUS;
         copperPikeRadius = DefaultSettings.COPPER_PIKE_RADIUS;
@@ -217,6 +220,7 @@ public final class ConfigSettings {
         try {
             switch (key) {
                 case "configVersion" -> configVersion = Integer.parseInt(value);
+                case "give_grimoire_on_join" -> giveGrimoireOnJoin = Boolean.parseBoolean(value);
                 case "wooden_pike_radius" -> woodenPikeRadius = parseRadius(value, "wooden", DefaultSettings.WOODEN_PIKE_RADIUS);
                 case "stone_pike_radius" -> stonePikeRadius = parseRadius(value, "stone", DefaultSettings.STONE_PIKE_RADIUS);
                 case "copper_pike_radius" -> copperPikeRadius = parseRadius(value, "copper", DefaultSettings.COPPER_PIKE_RADIUS);

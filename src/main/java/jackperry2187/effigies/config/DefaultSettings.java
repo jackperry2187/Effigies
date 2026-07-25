@@ -13,7 +13,12 @@ public final class DefaultSettings {
     /**
      * Config version - increment when schema changes to trigger regeneration.
      */
-    public static final int CONFIG_VERSION = 2;
+    public static final int CONFIG_VERSION = 3;
+
+    /**
+     * Whether to give the grimoire to a player the first time they join.
+     */
+    public static final boolean GIVE_GRIMOIRE_ON_JOIN = true;
 
     /**
      * Default chunk radius for each pike tier.

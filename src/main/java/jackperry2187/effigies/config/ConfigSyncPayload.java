@@ -15,6 +15,7 @@ import net.minecraft.resources.Identifier;
  * Sent to each player on join so tooltips reflect server settings.
  */
 public record ConfigSyncPayload(
+    boolean giveGrimoireOnJoin,
     int woodenPikeRadius,
     int stonePikeRadius,
     int copperPikeRadius,
@@ -30,6 +31,7 @@ public record ConfigSyncPayload(
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigSyncPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public ConfigSyncPayload decode(RegistryFriendlyByteBuf buf) {
+            boolean giveGrimoire = buf.readBoolean();
             int wooden = buf.readInt();
             int stone = buf.readInt();
             int copper = buf.readInt();
@@ -42,11 +44,12 @@ public record ConfigSyncPayload(
             for (int i = 0; i < mappingCount; i++) {
                 mappings.put(buf.readUtf(), buf.readUtf());
             }
-            return new ConfigSyncPayload(wooden, stone, copper, iron, golden, diamond, netherite, mappings);
+            return new ConfigSyncPayload(giveGrimoire, wooden, stone, copper, iron, golden, diamond, netherite, mappings);
         }
 
         @Override
         public void encode(RegistryFriendlyByteBuf buf, ConfigSyncPayload value) {
+            buf.writeBoolean(value.giveGrimoireOnJoin());
             buf.writeInt(value.woodenPikeRadius());
             buf.writeInt(value.stonePikeRadius());
             buf.writeInt(value.copperPikeRadius());
@@ -70,6 +73,7 @@ public record ConfigSyncPayload(
 
     public static ConfigSyncPayload fromCurrentConfig() {
         return new ConfigSyncPayload(
+            ConfigSettings.giveGrimoireOnJoin,
             ConfigSettings.woodenPikeRadius,
             ConfigSettings.stonePikeRadius,
             ConfigSettings.copperPikeRadius,
