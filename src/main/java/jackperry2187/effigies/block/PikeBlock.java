@@ -7,44 +7,12 @@ import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 import jackperry2187.effigies.registry.ModBlocks;
 import org.jetbrains.annotations.Nullable;
 
-//? if fabric {
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.explosion.Explosion;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-//?} else {
-/*import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -56,14 +24,13 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -71,28 +38,18 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.block.SoundType;
+
+//? if fabric {
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Explosion;
+//?} else {
+/*import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 *///?}
 
-public class PikeBlock extends Block
-    //? if fabric {
-    implements BlockEntityProvider
-    //?} else {
-    /*implements EntityBlock
-    *///?}
-{
-    //? if fabric {
-    public static final BooleanProperty ACTIVATED = BooleanProperty.of("activated");
-    //?} else {
-    /*public static final BooleanProperty ACTIVATED = BooleanProperty.create("activated");
-    *///?}
-    //? if fabric {
-    private static final VoxelShape SHAPE = Block.createCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
-    //?} else {
-    /*private static final VoxelShape SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
-    *///?}
+public class PikeBlock extends Block implements EntityBlock {
+    public static final BooleanProperty ACTIVATED = BooleanProperty.create("activated");
+    private static final VoxelShape SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
 
     private final PikeTier tier;
 
@@ -100,7 +57,7 @@ public class PikeBlock extends Block
     public PikeBlock(PikeTier tier, Identifier id) {
         super(tier.blockProperties(id));
         this.tier = tier;
-        setDefaultState(getStateManager().getDefaultState().with(ACTIVATED, false));
+        registerDefaultState(stateDefinition.any().setValue(ACTIVATED, false));
     }
     //?} else {
     /*public PikeBlock(PikeTier tier, BlockBehaviour.Properties props) {
@@ -116,7 +73,7 @@ public class PikeBlock extends Block
 
     //? if fabric {
     @Override
-    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
     //?} else {
@@ -128,30 +85,30 @@ public class PikeBlock extends Block
 
     //? if fabric {
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking()) {
-            return ActionResult.PASS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
         }
-        BlockPos headPos = pos.up();
-        BlockState headState = world.getBlockState(headPos);
+        BlockPos headPos = pos.above();
+        BlockState headState = level.getBlockState(headPos);
         if (!PikeBlockEntity.isValidHeadBlock(headState)) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        if (!world.isClient()) {
-            BlockEntity headBe = world.getBlockEntity(headPos);
+        if (!level.isClientSide()) {
+            BlockEntity headBe = level.getBlockEntity(headPos);
             ItemStack drop = ItemStack.EMPTY;
             if (headBe instanceof PikeHeadBlockEntity pikeHead) {
                 drop = pikeHead.getStoredItemStack();
                 pikeHead.setStoredHead("", 0);
             }
-            world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
-            world.removeBlock(headPos, false);
+            level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
+            level.removeBlock(headPos, false);
             if (!drop.isEmpty()) {
-                Block.dropStack(world, headPos, drop);
+                Block.popResource(level, headPos, drop);
             }
-            if (world instanceof ServerWorld serverWorld) {
-                PikeRegistry.unregisterPike(serverWorld, pos);
-                serverWorld.spawnParticles(
+            if (level instanceof ServerLevel serverLevel) {
+                PikeRegistry.unregisterPike(serverLevel, pos);
+                serverLevel.sendParticles(
                     ParticleTypes.SMOKE,
                     pos.getX() + 0.5,
                     pos.getY() + 1.5,
@@ -160,38 +117,38 @@ public class PikeBlock extends Block
                 );
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World world,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hit
     ) {
-        if (player.isSneaking()) {
-            BlockPos headPos = pos.up();
-            BlockState headState = world.getBlockState(headPos);
+        if (player.isShiftKeyDown()) {
+            BlockPos headPos = pos.above();
+            BlockState headState = level.getBlockState(headPos);
             if (PikeBlockEntity.isValidHeadBlock(headState)) {
-                if (!world.isClient()) {
-                    BlockEntity headBe = world.getBlockEntity(headPos);
+                if (!level.isClientSide()) {
+                    BlockEntity headBe = level.getBlockEntity(headPos);
                     ItemStack drop = ItemStack.EMPTY;
                     if (headBe instanceof PikeHeadBlockEntity pikeHead) {
                         drop = pikeHead.getStoredItemStack();
                         pikeHead.setStoredHead("", 0);
                     }
-                    world.setBlockState(pos, state.with(ACTIVATED, false), Block.NOTIFY_ALL);
-                    world.removeBlock(headPos, false);
+                    level.setBlock(pos, state.setValue(ACTIVATED, false), Block.UPDATE_ALL);
+                    level.removeBlock(headPos, false);
                     if (!drop.isEmpty()) {
-                        Block.dropStack(world, headPos, drop);
+                        Block.popResource(level, headPos, drop);
                     }
-                    if (world instanceof ServerWorld serverWorld) {
-                        PikeRegistry.unregisterPike(serverWorld, pos);
-                        serverWorld.spawnParticles(
+                    if (level instanceof ServerLevel serverLevel) {
+                        PikeRegistry.unregisterPike(serverLevel, pos);
+                        serverLevel.sendParticles(
                             ParticleTypes.SMOKE,
                             pos.getX() + 0.5,
                             pos.getY() + 1.5,
@@ -200,106 +157,40 @@ public class PikeBlock extends Block
                         );
                     }
                 }
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
 
         EntityType<?> headType = PikeBlockEntity.getHeadTypeFromItem(stack);
         if (headType == null) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        BlockPos headPos = pos.up();
-        if (PikeBlockEntity.isValidHeadBlock(world.getBlockState(headPos)) || !canPlaceHead(world, headPos)) {
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        BlockPos headPos = pos.above();
+        if (PikeBlockEntity.isValidHeadBlock(level.getBlockState(headPos)) || !canPlaceHead(level, headPos)) {
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!(stack.getItem() instanceof BlockItem blockItem)) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        if (!world.isClient()) {
-            String blockId = Registries.BLOCK.getId(blockItem.getBlock()).toString();
-            int rotation = MathHelper.floor((double) (player.getYaw() * 16.0F / 360.0F) + 0.5D) & 15;
+        if (!level.isClientSide()) {
+            String blockId = BuiltInRegistries.BLOCK.getKey(blockItem.getBlock()).toString();
+            int rotation = Mth.floor((double) (player.getYRot() * 16.0F / 360.0F) + 0.5D) & 15;
 
-            world.setBlockState(headPos, ModBlocks.pikeHead().getDefaultState(), Block.NOTIFY_LISTENERS);
-            BlockEntity be = world.getBlockEntity(headPos);
+            level.setBlock(headPos, ModBlocks.pikeHead().defaultBlockState(), Block.UPDATE_CLIENTS);
+            BlockEntity be = level.getBlockEntity(headPos);
             if (be instanceof PikeHeadBlockEntity pikeHead) {
                 pikeHead.setStoredHead(blockId, rotation);
             }
-            BlockSoundGroup soundGroup = blockItem.getBlock().getDefaultState().getSoundGroup();
-            world.playSound(null, headPos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS,
-                (soundGroup.getVolume() + 1.0F) / 2.0F, soundGroup.getPitch() * 0.8F);
-            updateActivatedState(world, pos, state);
-            if (!player.getAbilities().creativeMode) {
-                stack.decrement(1);
+            SoundType soundType = blockItem.getBlock().defaultBlockState().getSoundType();
+            level.playSound(null, headPos, soundType.getPlaceSound(), SoundSource.BLOCKS,
+                (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+            updateActivatedState(level, pos, state);
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(1);
             }
         }
-        return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!world.isClient()) {
-            // Unregister from pike registry if it was active
-            if (state.get(ACTIVATED) && world instanceof ServerWorld serverWorld) {
-                PikeRegistry.unregisterPike(serverWorld, pos);
-            }
-            breakHeadAbove(world, pos);
-        }
-        return super.onBreak(world, pos, state, player);
-    }
-
-    @Override
-    public void onDestroyedByExplosion(ServerWorld world, BlockPos pos, Explosion explosion) {
-        // Unregister from pike registry (we check the block state before it's destroyed)
-        BlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof PikeBlock && state.get(ACTIVATED)) {
-            PikeRegistry.unregisterPike(world, pos);
-        }
-        breakHeadAbove(world, pos);
-        super.onDestroyedByExplosion(world, pos, explosion);
-    }
-
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-        if (!world.isClient()) {
-            updateActivatedState(world, pos, state);
-        }
-    }
-
-    @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, @Nullable WireOrientation wireOrientation, boolean notify) {
-        super.neighborUpdate(state, world, pos, block, wireOrientation, notify);
-        if (!world.isClient()) {
-            updateActivatedState(world, pos, state);
-        }
-    }
-
-    @Override
-    protected BlockState getStateForNeighborUpdate(
-        BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
-        BlockPos pos,
-        Direction direction,
-        BlockPos neighborPos,
-        BlockState neighborState,
-        Random random
-    ) {
-        // Note: State updates are handled by neighborUpdate -> updateActivatedState
-        // to ensure messages are sent properly. Don't update state here.
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-    }
-
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(ACTIVATED);
-    }
-
-    @Nullable
-    @Override
-    public PikeBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new PikeBlockEntity(pos, state);
+        return InteractionResult.SUCCESS;
     }
     //?} else {
     /*@Override
@@ -330,7 +221,7 @@ public class PikeBlock extends Block
             if (!drop.isEmpty()) {
                 Block.popResource(level, headPos, drop);
             }
-            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            if (level instanceof ServerLevel serverLevel) {
                 PikeRegistry.unregisterPike(serverLevel, pos);
                 serverLevel.sendParticles(
                     ParticleTypes.SMOKE,
@@ -370,7 +261,7 @@ public class PikeBlock extends Block
                     if (!drop.isEmpty()) {
                         Block.popResource(level, headPos, drop);
                     }
-                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                    if (level instanceof ServerLevel serverLevel) {
                         PikeRegistry.unregisterPike(serverLevel, pos);
                         serverLevel.sendParticles(
                             ParticleTypes.SMOKE,
@@ -416,12 +307,12 @@ public class PikeBlock extends Block
         }
         return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
     }
+    *///?}
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
-            // Unregister from pike registry if it was active
-            if (state.getValue(ACTIVATED) && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            if (state.getValue(ACTIVATED) && level instanceof ServerLevel serverLevel) {
                 PikeRegistry.unregisterPike(serverLevel, pos);
             }
             breakHeadAbove(level, pos);
@@ -429,10 +320,20 @@ public class PikeBlock extends Block
         return super.playerWillDestroy(level, pos, state, player);
     }
 
+    //? if fabric {
     @Override
+    public void wasExploded(ServerLevel level, BlockPos pos, Explosion explosion) {
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof PikeBlock && state.getValue(ACTIVATED)) {
+            PikeRegistry.unregisterPike(level, pos);
+        }
+        breakHeadAbove(level, pos);
+        super.wasExploded(level, pos, explosion);
+    }
+    //?} else {
+    /*@Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            // Unregister from pike registry if it was active
+        if (level instanceof ServerLevel serverLevel) {
             if (state.getValue(ACTIVATED)) {
                 PikeRegistry.unregisterPike(serverLevel, pos);
             }
@@ -440,6 +341,7 @@ public class PikeBlock extends Block
         }
         super.destroy(level, pos, state);
     }
+    *///?}
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
@@ -483,113 +385,8 @@ public class PikeBlock extends Block
     public PikeBlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new PikeBlockEntity(pos, state);
     }
-    *///?}
 
-    //? if fabric {
-    private void updateActivatedState(World world, BlockPos pos, BlockState state) {
-        BlockPos headPos = pos.up();
-        BlockState headState = world.getBlockState(headPos);
-        boolean active = PikeBlockEntity.isValidHeadBlock(headState);
-        BlockState currentWorldState = world.getBlockState(pos);
-        boolean wasActive = currentWorldState.get(ACTIVATED);
-        if (wasActive != active) {
-            world.setBlockState(pos, currentWorldState.with(ACTIVATED, active), Block.NOTIFY_ALL);
-            if (world instanceof ServerWorld serverWorld) {
-                if (active) {
-                    EntityType<?> headType = PikeBlockEntity.getHeadTypeFromWorld(world, headPos);
-                    if (headType != null) {
-                        // Register pike in the registry for efficient spawn blocking
-                        PikeRegistry.registerPike(serverWorld, pos, tier, headType);
-                        // Spawn activation particles
-                        serverWorld.spawnParticles(
-                            ParticleTypes.FLAME,
-                            pos.getX() + 0.5,
-                            pos.getY() + 1.5,
-                            pos.getZ() + 0.5,
-                            15,    // particle count
-                            0.3,   // deltaX (horizontal spread)
-                            0.4,   // deltaY (vertical spread)
-                            0.3,   // deltaZ (horizontal spread)
-                            0.02   // speed
-                        );
-                    }
-                } else {
-                    // Unregister pike from the registry
-                    PikeRegistry.unregisterPike(serverWorld, pos);
-                    // Spawn deactivation particles
-                    serverWorld.spawnParticles(
-                        ParticleTypes.SMOKE,
-                        pos.getX() + 0.5,
-                        pos.getY() + 1.5,
-                        pos.getZ() + 0.5,
-                        15,    // particle count
-                        0.3,   // deltaX (horizontal spread)
-                        0.4,   // deltaY (vertical spread)
-                        0.3,   // deltaZ (horizontal spread)
-                        0.02   // speed
-                    );
-                }
-            }
-        }
-    }
-
-    private void breakHeadAbove(World world, BlockPos pos) {
-        BlockPos headPos = pos.up();
-        BlockState headState = world.getBlockState(headPos);
-        if (PikeBlockEntity.isValidHeadBlock(headState)) {
-            BlockEntity be = world.getBlockEntity(headPos);
-            if (be instanceof PikeHeadBlockEntity pikeHead) {
-                ItemStack drop = pikeHead.getStoredItemStack();
-                pikeHead.setStoredHead("", 0);
-                if (drop != null && !drop.isEmpty()) {
-                    Block.dropStack(world, headPos, drop);
-                }
-            }
-            world.removeBlock(headPos, false);
-        }
-    }
-
-    private boolean canPlaceHead(World world, BlockPos headPos) {
-        BlockState state = world.getBlockState(headPos);
-        return state.isAir() || state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.LAVA;
-    }
-
-    // Debug messages - commented out for release
-    // private void sendActivationMessage(PlayerEntity player, EntityType<?> headType) {
-    //     String entityName = Registries.ENTITY_TYPE.getId(headType).getPath();
-    //     int chunkRadius = tier.chunkRadius();
-    //     String radiusText = chunkRadius == 0 ? "same chunk only" : chunkRadius + " chunk" + (chunkRadius > 1 ? "s" : "") + " radius";
-    //     player.sendMessage(
-    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-    //             .append(Text.literal("Now preventing ").formatted(Formatting.GREEN))
-    //             .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-    //             .append(Text.literal(" spawns within ").formatted(Formatting.GREEN))
-    //             .append(Text.literal(radiusText).formatted(Formatting.AQUA)),
-    //         false
-    //     );
-    // }
-
-    // private void sendDeactivationMessage(PlayerEntity player, EntityType<?> headType) {
-    //     String entityName = headType != null ? Registries.ENTITY_TYPE.getId(headType).getPath() : "unknown";
-    //     player.sendMessage(
-    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-    //             .append(Text.literal("No longer preventing ").formatted(Formatting.RED))
-    //             .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-    //             .append(Text.literal(" spawns.").formatted(Formatting.RED)),
-    //         false
-    //     );
-    // }
-
-    // private void sendDeactivationMessageGeneric(PlayerEntity player) {
-    //     player.sendMessage(
-    //         Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-    //             .append(Text.literal("Pike deactivated - head removed.").formatted(Formatting.RED)),
-    //         false
-    //     );
-    // }
-
-    //?} else {
-    /*private void updateActivatedState(Level level, BlockPos pos, BlockState state) {
+    private void updateActivatedState(Level level, BlockPos pos, BlockState state) {
         BlockPos headPos = pos.above();
         BlockState headState = level.getBlockState(headPos);
         boolean active = PikeBlockEntity.isValidHeadBlock(headState);
@@ -597,13 +394,11 @@ public class PikeBlock extends Block
         boolean wasActive = currentWorldState.getValue(ACTIVATED);
         if (wasActive != active) {
             level.setBlock(pos, currentWorldState.setValue(ACTIVATED, active), Block.UPDATE_ALL);
-            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            if (level instanceof ServerLevel serverLevel) {
                 if (active) {
                     EntityType<?> headType = PikeBlockEntity.getHeadTypeFromWorld(level, headPos);
                     if (headType != null) {
-                        // Register pike in the registry for efficient spawn blocking
                         PikeRegistry.registerPike(serverLevel, pos, tier, headType);
-                        // Spawn activation particles
                         serverLevel.sendParticles(
                             ParticleTypes.FLAME,
                             pos.getX() + 0.5,
@@ -617,9 +412,7 @@ public class PikeBlock extends Block
                         );
                     }
                 } else {
-                    // Unregister pike from the registry
                     PikeRegistry.unregisterPike(serverLevel, pos);
-                    // Spawn deactivation particles
                     serverLevel.sendParticles(
                         ParticleTypes.SMOKE,
                         pos.getX() + 0.5,
@@ -690,6 +483,4 @@ public class PikeBlock extends Block
     //         false
     //     );
     // }
-
-    *///?}
 }

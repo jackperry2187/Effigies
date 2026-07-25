@@ -11,17 +11,25 @@ import jackperry2187.effigies.registry.ModBlockEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+//? if mc12011 {
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+*///?}
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 public class EffigiesClientFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockEntityRendererFactories.register(ModBlockEntities.pikeHead(), PikeHeadBlockEntityRenderer::new);
+        //? if mc12011 {
+        BlockEntityRenderers.register(ModBlockEntities.pikeHead(), PikeHeadBlockEntityRenderer::new);
+        //?} else {
+        /*BlockEntityRendererRegistry.register(ModBlockEntities.pikeHead(), PikeHeadBlockEntityRenderer::new);
+        *///?}
 
         // Register config sync receiver
-        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.ID, (payload, context) -> {
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.TYPE, (payload, context) -> {
             ConfigSettings.applySyncedValues(payload);
         });
 
@@ -30,24 +38,24 @@ public class EffigiesClientFabric implements ClientModInitializer {
             if (stack.getItem() instanceof PikeItem pikeItem) {
                 int radius = pikeItem.getTier().chunkRadius();
                 if (radius < 0) {
-                    lines.add(Text.translatable("item.effigies.pike.tooltip.disabled").formatted(Formatting.GRAY));
+                    lines.add(Component.translatable("item.effigies.pike.tooltip.disabled").withStyle(ChatFormatting.GRAY));
                 } else {
-                    lines.add(Text.translatable("item.effigies.pike.tooltip.prevents_spawns").formatted(Formatting.GRAY));
+                    lines.add(Component.translatable("item.effigies.pike.tooltip.prevents_spawns").withStyle(ChatFormatting.GRAY));
                     if (radius == 0) {
-                        lines.add(Text.translatable("item.effigies.pike.tooltip.chunk_only").formatted(Formatting.GRAY));
+                        lines.add(Component.translatable("item.effigies.pike.tooltip.chunk_only").withStyle(ChatFormatting.GRAY));
                     } else {
-                        lines.add(Text.translatable("item.effigies.pike.tooltip.chunk_radius", radius).formatted(Formatting.GRAY));
+                        lines.add(Component.translatable("item.effigies.pike.tooltip.chunk_radius", radius).withStyle(ChatFormatting.GRAY));
                     }
                 }
-                lines.add(Text.translatable("item.effigies.pike.tooltip.activate").formatted(Formatting.DARK_GRAY));
+                lines.add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
             }
             if (stack.getItem() instanceof AntiSpearItem) {
-                lines.add(Text.translatable("item.effigies.anti_spear.tooltip").formatted(Formatting.DARK_PURPLE));
+                lines.add(Component.translatable("item.effigies.anti_spear.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
             }
-            if (stack.isOf(ModBlocks.antiPike().asItem())) {
-                lines.add(Text.translatable("item.effigies.anti_pike.tooltip.spawns").formatted(Formatting.DARK_PURPLE));
-                lines.add(Text.translatable("item.effigies.anti_pike.tooltip.bypass").formatted(Formatting.RED));
-                lines.add(Text.translatable("item.effigies.pike.tooltip.activate").formatted(Formatting.DARK_GRAY));
+            if (stack.is(ModBlocks.antiPike().asItem())) {
+                lines.add(Component.translatable("item.effigies.anti_pike.tooltip.spawns").withStyle(ChatFormatting.DARK_PURPLE));
+                lines.add(Component.translatable("item.effigies.anti_pike.tooltip.bypass").withStyle(ChatFormatting.RED));
+                lines.add(Component.translatable("item.effigies.pike.tooltip.activate").withStyle(ChatFormatting.DARK_GRAY));
             }
         });
     }

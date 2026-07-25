@@ -9,13 +9,13 @@ import jackperry2187.effigies.item.PikeItem;
 import java.util.List;
 
 //? if fabric {
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 //?} else {
 /*import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -42,67 +42,67 @@ public final class ModItems {
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
-        WOODEN_PIKE = Registry.register(Registries.ITEM, woodenPikeId,
-            new PikeItem(ModBlocks.woodenPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, woodenPikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.WOODEN));
+        WOODEN_PIKE = Registry.register(BuiltInRegistries.ITEM, woodenPikeId,
+            new PikeItem(ModBlocks.woodenPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, woodenPikeId))
+                .useBlockDescriptionPrefix(), PikeTier.WOODEN));
 
         Identifier stonePikeId = Effigies.id("stone_pike");
-        STONE_PIKE = Registry.register(Registries.ITEM, stonePikeId,
-            new PikeItem(ModBlocks.stonePike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, stonePikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.STONE));
+        STONE_PIKE = Registry.register(BuiltInRegistries.ITEM, stonePikeId,
+            new PikeItem(ModBlocks.stonePike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, stonePikeId))
+                .useBlockDescriptionPrefix(), PikeTier.STONE));
 
         Identifier copperPikeId = Effigies.id("copper_pike");
-        COPPER_PIKE = Registry.register(Registries.ITEM, copperPikeId,
-            new PikeItem(ModBlocks.copperPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, copperPikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.COPPER));
+        COPPER_PIKE = Registry.register(BuiltInRegistries.ITEM, copperPikeId,
+            new PikeItem(ModBlocks.copperPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, copperPikeId))
+                .useBlockDescriptionPrefix(), PikeTier.COPPER));
 
         Identifier ironPikeId = Effigies.id("iron_pike");
-        IRON_PIKE = Registry.register(Registries.ITEM, ironPikeId,
-            new PikeItem(ModBlocks.ironPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, ironPikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.IRON));
+        IRON_PIKE = Registry.register(BuiltInRegistries.ITEM, ironPikeId,
+            new PikeItem(ModBlocks.ironPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, ironPikeId))
+                .useBlockDescriptionPrefix(), PikeTier.IRON));
 
         Identifier goldenPikeId = Effigies.id("golden_pike");
-        GOLDEN_PIKE = Registry.register(Registries.ITEM, goldenPikeId,
-            new PikeItem(ModBlocks.goldenPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, goldenPikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.GOLDEN));
+        GOLDEN_PIKE = Registry.register(BuiltInRegistries.ITEM, goldenPikeId,
+            new PikeItem(ModBlocks.goldenPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, goldenPikeId))
+                .useBlockDescriptionPrefix(), PikeTier.GOLDEN));
 
         Identifier diamondPikeId = Effigies.id("diamond_pike");
-        DIAMOND_PIKE = Registry.register(Registries.ITEM, diamondPikeId,
-            new PikeItem(ModBlocks.diamondPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, diamondPikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.DIAMOND));
+        DIAMOND_PIKE = Registry.register(BuiltInRegistries.ITEM, diamondPikeId,
+            new PikeItem(ModBlocks.diamondPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, diamondPikeId))
+                .useBlockDescriptionPrefix(), PikeTier.DIAMOND));
 
         Identifier netheritePikeId = Effigies.id("netherite_pike");
-        NETHERITE_PIKE = Registry.register(Registries.ITEM, netheritePikeId,
-            new PikeItem(ModBlocks.netheritePike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, netheritePikeId))
-                .useBlockPrefixedTranslationKey(), PikeTier.NETHERITE));
+        NETHERITE_PIKE = Registry.register(BuiltInRegistries.ITEM, netheritePikeId,
+            new PikeItem(ModBlocks.netheritePike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, netheritePikeId))
+                .useBlockDescriptionPrefix(), PikeTier.NETHERITE));
 
         Identifier antiSpearId = Effigies.id("anti_spear");
-        ANTI_SPEAR = Registry.register(Registries.ITEM, antiSpearId,
-            new AntiSpearItem(new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, antiSpearId))
-                .useItemPrefixedTranslationKey()
+        ANTI_SPEAR = Registry.register(BuiltInRegistries.ITEM, antiSpearId,
+            new AntiSpearItem(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, antiSpearId))
+                .useItemDescriptionPrefix()
                 .spear(AntiSpearItem.MATERIAL, 1.05f, 1.3f, 0.35f, 2.0f, 6.0f, 5.0f, 5.1f, 7.5f, 4.6f)
-                .fireproof()));
+                .fireResistant()));
 
         Identifier antiPikeId = Effigies.id("anti_pike");
-        ANTI_PIKE = Registry.register(Registries.ITEM, antiPikeId,
-            new BlockItem(ModBlocks.antiPike(), new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, antiPikeId))
-                .useBlockPrefixedTranslationKey()));
+        ANTI_PIKE = Registry.register(BuiltInRegistries.ITEM, antiPikeId,
+            new BlockItem(ModBlocks.antiPike(), new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, antiPikeId))
+                .useBlockDescriptionPrefix()));
 
         Identifier grimoireId = Effigies.id("grimoire");
-        GRIMOIRE = Registry.register(Registries.ITEM, grimoireId,
-            new GrimoireItem(new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, grimoireId))
-                .useItemPrefixedTranslationKey()
-                .maxCount(1)));
+        GRIMOIRE = Registry.register(BuiltInRegistries.ITEM, grimoireId,
+            new GrimoireItem(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, grimoireId))
+                .useItemDescriptionPrefix()
+                .stacksTo(1)));
     }
 
     public static List<Item> getAllPikeItems() {

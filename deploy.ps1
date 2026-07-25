@@ -4,11 +4,30 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ProjectRoot   = $PSScriptRoot
-$FabricLibs    = Join-Path $ProjectRoot "versions\1.21.11-fabric\build\libs"
-$NeoForgeLibs  = Join-Path $ProjectRoot "versions\1.21.11-neoforge\build\libs"
-$FabricMods    = "C:\Users\Jackson\curseforge\minecraft\Instances\MFC-FAB-1.21.11\mods"
-$NeoForgeMods  = "C:\Users\Jackson\curseforge\minecraft\Instances\NEO-1.21.11\mods"
+$ProjectRoot = $PSScriptRoot
+
+$Targets = @(
+    @{
+        Label    = "1.21.11 Fabric"
+        LibsDir  = Join-Path $ProjectRoot "versions\1.21.11-fabric\build\libs"
+        ModsDir  = "C:\Users\Jackson\curseforge\minecraft\Instances\MFC-FAB-1.21.11\mods"
+    },
+    @{
+        Label    = "1.21.11 NeoForge"
+        LibsDir  = Join-Path $ProjectRoot "versions\1.21.11-neoforge\build\libs"
+        ModsDir  = "C:\Users\Jackson\curseforge\minecraft\Instances\NEO-1.21.11\mods"
+    },
+    @{
+        Label    = "26.1 Fabric"
+        LibsDir  = Join-Path $ProjectRoot "versions\26.1-fabric\build\libs"
+        ModsDir  = "C:\Users\Jackson\curseforge\minecraft\Instances\FAB-26.1\mods"
+    },
+    @{
+        Label    = "26.1 NeoForge"
+        LibsDir  = Join-Path $ProjectRoot "versions\26.1-neoforge\build\libs"
+        ModsDir  = "C:\Users\Jackson\curseforge\minecraft\Instances\NEO-26.1\mods"
+    }
+)
 
 if (-not $SkipBuild) {
     Write-Host "`n=== Building Effigies ===" -ForegroundColor Cyan
@@ -29,14 +48,12 @@ function Deploy-Jar {
 
     Write-Host "`n=== Deploying $Label ===" -ForegroundColor Cyan
 
-    # Remove any existing effigies jars from the mods folder (but nothing else)
     $existing = Get-ChildItem $ModsDir -Filter "effigies-*.jar" -ErrorAction SilentlyContinue
     foreach ($jar in $existing) {
         Write-Host "  Removing old jar: $($jar.Name)" -ForegroundColor Yellow
         Remove-Item $jar.FullName -Force
     }
 
-    # Find the latest non-sources jar
     $latest = Get-ChildItem $LibsDir -Filter "effigies-*.jar" |
               Where-Object { $_.Name -notlike "*-sources.jar" } |
               Sort-Object LastWriteTime -Descending |
@@ -51,7 +68,8 @@ function Deploy-Jar {
     Copy-Item $latest.FullName -Destination $ModsDir
 }
 
-Deploy-Jar -LibsDir $FabricLibs   -ModsDir $FabricMods   -Label "Fabric"
-Deploy-Jar -LibsDir $NeoForgeLibs -ModsDir $NeoForgeMods -Label "NeoForge"
+foreach ($target in $Targets) {
+    Deploy-Jar -LibsDir $target.LibsDir -ModsDir $target.ModsDir -Label $target.Label
+}
 
 Write-Host "`nDone!" -ForegroundColor Green

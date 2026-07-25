@@ -11,18 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-//? if fabric {
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-//?} else {
-/*import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -31,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-*///?}
 
 /**
  * Registry for tracking active pikes efficiently.
@@ -46,21 +34,13 @@ public final class PikeRegistry {
     public record PikeData(
         BlockPos pos,
         PikeTier tier,
-        //? if fabric {
         EntityType<?> entityType,
-        //?} else {
-        /*EntityType<?> entityType,
-        *///?}
         int chunkX,
         int chunkZ
     ) {}
 
     // Map: Dimension Registry Key -> (Map: Chunk Long Position -> List<PikeData>)
-    //? if fabric {
-    private static final Map<RegistryKey<World>, Map<Long, List<PikeData>>> pikesByDimension = new ConcurrentHashMap<>();
-    //?} else {
-    /*private static final Map<ResourceKey<Level>, Map<Long, List<PikeData>>> pikesByDimension = new ConcurrentHashMap<>();
-    *///?}
+    private static final Map<ResourceKey<Level>, Map<Long, List<PikeData>>> pikesByDimension = new ConcurrentHashMap<>();
 
     /**
      * Gets the maximum chunk radius across all pike tiers.
@@ -81,13 +61,12 @@ public final class PikeRegistry {
 
     /**
      * Helper method to compute chunk key from chunk coordinates.
-     * Handles different method names between Fabric and NeoForge.
      */
     private static long chunkKey(int chunkX, int chunkZ) {
-        //? if fabric {
-        return ChunkPos.toLong(chunkX, chunkZ);
+        //? if mc12011 {
+        return ChunkPos.asLong(chunkX, chunkZ);
         //?} else {
-        /*return ChunkPos.asLong(chunkX, chunkZ);
+        /*return ChunkPos.pack(chunkX, chunkZ);
         *///?}
     }
 
@@ -95,13 +74,8 @@ public final class PikeRegistry {
      * Registers an active pike in the registry.
      * Called when a pike becomes active (head is placed).
      */
-    //? if fabric {
-    public static void registerPike(ServerWorld level, BlockPos pos, PikeTier tier, EntityType<?> entityType) {
-        RegistryKey<World> dimension = level.getRegistryKey();
-        //?} else {
-    /*public static void registerPike(ServerLevel level, BlockPos pos, PikeTier tier, EntityType<?> entityType) {
+    public static void registerPike(ServerLevel level, BlockPos pos, PikeTier tier, EntityType<?> entityType) {
         ResourceKey<Level> dimension = level.dimension();
-        *///?}
         
         Map<Long, List<PikeData>> dimensionPikes = pikesByDimension.computeIfAbsent(dimension, k -> new ConcurrentHashMap<>());
         
@@ -126,13 +100,8 @@ public final class PikeRegistry {
      * Unregisters a pike from the registry.
      * Called when a pike is broken or deactivated (head is removed).
      */
-    //? if fabric {
-    public static void unregisterPike(ServerWorld level, BlockPos pos) {
-        RegistryKey<World> dimension = level.getRegistryKey();
-        //?} else {
-    /*public static void unregisterPike(ServerLevel level, BlockPos pos) {
+    public static void unregisterPike(ServerLevel level, BlockPos pos) {
         ResourceKey<Level> dimension = level.dimension();
-        *///?}
         
         Map<Long, List<PikeData>> dimensionPikes = pikesByDimension.get(dimension);
         if (dimensionPikes == null) {
@@ -157,13 +126,8 @@ public final class PikeRegistry {
      * Updates a pike's entity type in the registry.
      * Called when the head on a pike changes.
      */
-    //? if fabric {
-    public static void updatePikeEntityType(ServerWorld level, BlockPos pos, EntityType<?> newEntityType) {
-        RegistryKey<World> dimension = level.getRegistryKey();
-        //?} else {
-    /*public static void updatePikeEntityType(ServerLevel level, BlockPos pos, EntityType<?> newEntityType) {
+    public static void updatePikeEntityType(ServerLevel level, BlockPos pos, EntityType<?> newEntityType) {
         ResourceKey<Level> dimension = level.dimension();
-        *///?}
         
         Map<Long, List<PikeData>> dimensionPikes = pikesByDimension.get(dimension);
         if (dimensionPikes == null) {
@@ -193,13 +157,8 @@ public final class PikeRegistry {
     /**
      * Clears all pikes in a specific chunk when it's unloaded.
      */
-    //? if fabric {
-    public static void onChunkUnload(ServerWorld level, int chunkX, int chunkZ) {
-        RegistryKey<World> dimension = level.getRegistryKey();
-        //?} else {
-    /*public static void onChunkUnload(ServerLevel level, int chunkX, int chunkZ) {
+    public static void onChunkUnload(ServerLevel level, int chunkX, int chunkZ) {
         ResourceKey<Level> dimension = level.dimension();
-        *///?}
         
         Map<Long, List<PikeData>> dimensionPikes = pikesByDimension.get(dimension);
         if (dimensionPikes == null) {
@@ -214,51 +173,7 @@ public final class PikeRegistry {
      * Scans a chunk for active pikes and registers them.
      * Called when a chunk is loaded.
      */
-    //? if fabric {
-    public static void onChunkLoad(ServerWorld level, WorldChunk chunk) {
-        for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-            if (!(blockEntity instanceof PikeBlockEntity)) {
-                continue;
-            }
-            BlockPos pos = blockEntity.getPos();
-            // Use chunk.getBlockState() instead of level.getBlockState() to avoid
-            // potential deadlock during chunk loading (the chunk may not be fully
-            // registered with the world yet)
-            BlockState state = chunk.getBlockState(pos);
-            if (!(state.getBlock() instanceof PikeBlock pikeBlock)) {
-                continue;
-            }
-            // Only register if the pike is activated
-            if (!state.get(PikeBlock.ACTIVATED)) {
-                continue;
-            }
-            BlockPos headPos = pos.up();
-            EntityType<?> entityType = null;
-
-            // The head above is a PikeHeadBlock that stores the original block ID
-            // in its block entity — resolve entity type from that stored data
-            BlockEntity headBe = chunk.getBlockEntity(headPos);
-            if (headBe instanceof PikeHeadBlockEntity pikeHead) {
-                BlockState storedState = pikeHead.getStoredBlockState();
-                if (storedState != null) {
-                    entityType = PikeBlockEntity.getHeadTypeFromBlockState(storedState);
-                }
-            }
-
-            // Fallback: direct block state lookup (for any non-PikeHeadBlock heads)
-            if (entityType == null) {
-                BlockState headState = chunk.getBlockState(headPos);
-                entityType = PikeBlockEntity.getHeadTypeFromBlockState(headState);
-            }
-
-            if (entityType == null) {
-                continue;
-            }
-            registerPike(level, pos, pikeBlock.tier(), entityType);
-        }
-    }
-    //?} else {
-    /*public static void onChunkLoad(ServerLevel level, LevelChunk chunk) {
+    public static void onChunkLoad(ServerLevel level, LevelChunk chunk) {
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
             if (!(blockEntity instanceof PikeBlockEntity)) {
                 continue;
@@ -299,17 +214,12 @@ public final class PikeRegistry {
             registerPike(level, pos, pikeBlock.tier(), entityType);
         }
     }
-    *///?}
 
     /**
      * Clears the entire registry for a dimension.
      * Called when a world is unloaded.
      */
-    //? if fabric {
-    public static void onWorldUnload(RegistryKey<World> dimension) {
-        //?} else {
-    /*public static void onWorldUnload(ResourceKey<Level> dimension) {
-        *///?}
+    public static void onWorldUnload(ResourceKey<Level> dimension) {
         pikesByDimension.remove(dimension);
     }
 
@@ -331,13 +241,8 @@ public final class PikeRegistry {
      * @return The blocking pike's data if spawn is blocked, null otherwise
      */
     @Nullable
-    //? if fabric {
-    public static PikeData getBlockingPike(ServerWorld level, BlockPos spawnPos, EntityType<?> entityType) {
-        RegistryKey<World> dimension = level.getRegistryKey();
-        //?} else {
-    /*public static PikeData getBlockingPike(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
+    public static PikeData getBlockingPike(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
         ResourceKey<Level> dimension = level.dimension();
-        *///?}
         
         Map<Long, List<PikeData>> dimensionPikes = pikesByDimension.get(dimension);
         if (dimensionPikes == null || dimensionPikes.isEmpty()) {

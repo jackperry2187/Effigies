@@ -16,7 +16,7 @@ logoFile = "assets/effigies/icon.png"
 [[dependencies.effigies]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.11,)"
+versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 

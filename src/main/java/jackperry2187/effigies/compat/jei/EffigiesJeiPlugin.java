@@ -13,33 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-//? if fabric {
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-//?} else {
-/*import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-*///?}
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 @JeiPlugin
 public class EffigiesJeiPlugin implements IModPlugin {
 
     @Override
-    //? if fabric {
     public Identifier getPluginUid() {
         Effigies.LOGGER.info("[JEI] Effigies JEI plugin discovered (getPluginUid called)");
         return Effigies.id("jei_plugin");
     }
-    //?} else {
-    /*public Identifier getPluginUid() {
-        Effigies.LOGGER.info("[JEI] Effigies JEI plugin discovered (getPluginUid called)");
-        return Effigies.id("jei_plugin");
-    }
-    *///?}
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
@@ -51,19 +37,11 @@ public class EffigiesJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        //? if fabric {
         List<Item> pikes = ModItems.getAllPikeItems();
         Effigies.LOGGER.info("[JEI] Registering {} pike items as recipe catalysts", pikes.size());
         for (Item pike : pikes) {
             registration.addCraftingStation(PikePreventionCategory.RECIPE_TYPE, pike);
         }
-        //?} else {
-        /*List<Item> pikes = ModItems.getAllPikeItems();
-        Effigies.LOGGER.info("[JEI] Registering {} pike items as recipe catalysts", pikes.size());
-        for (Item pike : pikes) {
-            registration.addCraftingStation(PikePreventionCategory.RECIPE_TYPE, pike);
-        }
-        *///?}
     }
 
     @Override
@@ -81,17 +59,10 @@ public class EffigiesJeiPlugin implements IModPlugin {
             String blockId = entry.getKey();
             String entityId = entry.getValue();
 
-            //? if fabric {
             Identifier blockIdentifier = Identifier.tryParse(blockId);
-            if (blockIdentifier == null || !Registries.BLOCK.containsId(blockIdentifier)) continue;
-
-            Item headItem = Registries.BLOCK.get(blockIdentifier).asItem();
-            //?} else {
-            /*Identifier blockIdentifier = Identifier.tryParse(blockId);
             if (blockIdentifier == null || !BuiltInRegistries.BLOCK.containsKey(blockIdentifier)) continue;
 
             Item headItem = BuiltInRegistries.BLOCK.getValue(blockIdentifier).asItem();
-            *///?}
 
             ItemStack headStack = new ItemStack(headItem);
             if (headStack.isEmpty()) continue;

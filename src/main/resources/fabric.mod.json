@@ -25,6 +25,7 @@
             "jackperry2187.effigies.compat.jei.EffigiesJeiPlugin"
         ]
     },
+    ${access_widener_entry}
     "mixins": [],
     "depends": {
         "fabricloader": ">=0.18.4",

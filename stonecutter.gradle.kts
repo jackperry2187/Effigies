@@ -4,24 +4,28 @@ plugins {
 
 stonecutter active "1.21.11-fabric" /* [SC] DO NOT EDIT */
 
-// Configure Stonecutter parameters for conditional processing
-stonecutter.parameters {
-    val loader = stonecutter.current.version.substringAfter("-")
-    consts["fabric"] = loader == "fabric"
-    consts["neoforge"] = loader == "neoforge"
+stonecutter {
+    parameters {
+        constants {
+            val loader = node.metadata.project.substringAfterLast("-")
+            put("fabric", loader == "fabric")
+            put("neoforge", loader == "neoforge")
+            put("mc12011", node.metadata.version == "1.21.11")
+            put("mc261", node.metadata.version == "26.1")
+        }
+    }
 }
 
-stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
-    group = "project"
-    ofTask("build")
+for (node in stonecutter.tree.nodes) {
+    tasks.register("build-${node.metadata.project}") {
+        group = "project"
+        dependsOn(":${node.metadata.project}:build")
+    }
 }
 
-stonecutter registerChiseled tasks.register("chiseledPublish", stonecutter.chiseled) {
+tasks.register("chiseledBuild") {
     group = "project"
-    ofTask("publish")
-}
-
-stonecutter registerChiseled tasks.register("chiseledRunClient", stonecutter.chiseled) {
-    group = "project"
-    ofTask("runClient")
+    for (node in stonecutter.tree.nodes) {
+        dependsOn(":${node.metadata.project}:build")
+    }
 }

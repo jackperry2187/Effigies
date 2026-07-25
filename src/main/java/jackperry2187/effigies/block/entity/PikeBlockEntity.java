@@ -8,20 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-//? if fabric {
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-//?} else {
-/*import net.neoforged.fml.ModList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -32,15 +18,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+//? if fabric {
+import net.fabricmc.loader.api.FabricLoader;
+//?} else {
+/*import net.neoforged.fml.ModList;
 *///?}
 
 public class PikeBlockEntity extends BlockEntity {
     public PikeBlockEntity(BlockPos pos, BlockState state) {
-        //? if fabric {
         super(ModBlockEntities.pike(), pos, state);
-        //?} else {
-        /*super(ModBlockEntities.pike(), pos, state);
-        *///?}
     }
 
     public static boolean isValidHeadItem(ItemStack stack) {
@@ -56,28 +43,16 @@ public class PikeBlockEntity extends BlockEntity {
         if (stack.isEmpty()) {
             return null;
         }
-        //? if fabric {
         if (!(stack.getItem() instanceof BlockItem blockItem)) {
             return null;
         }
         Block block = blockItem.getBlock();
-        String blockId = Registries.BLOCK.getId(block).toString();
-        //?} else {
-        /*if (!(stack.getItem() instanceof BlockItem blockItem)) {
-            return null;
-        }
-        Block block = blockItem.getBlock();
         String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
-        *///?}
         String entityId = ConfigSettings.getEntityIdForBlock(blockId);
         if (entityId == null) {
             return null;
         }
-        //? if fabric {
-        return block.getDefaultState();
-        //?} else {
-        /*return block.defaultBlockState();
-        *///?}
+        return block.defaultBlockState();
     }
 
     @Nullable
@@ -85,29 +60,17 @@ public class PikeBlockEntity extends BlockEntity {
         if (stack.isEmpty()) {
             return null;
         }
-        //? if fabric {
         if (!(stack.getItem() instanceof BlockItem blockItem)) {
             return null;
         }
         Block block = blockItem.getBlock();
-        String blockId = Registries.BLOCK.getId(block).toString();
-        //?} else {
-        /*if (!(stack.getItem() instanceof BlockItem blockItem)) {
-            return null;
-        }
-        Block block = blockItem.getBlock();
         String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
-        *///?}
         return resolveEntityType(blockId);
     }
 
     @Nullable
     public static EntityType<?> getHeadTypeFromBlockState(BlockState state) {
-        //? if fabric {
-        String blockId = Registries.BLOCK.getId(state.getBlock()).toString();
-        //?} else {
-        /*String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
-        *///?}
+        String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
         return resolveEntityType(blockId);
     }
 
@@ -116,23 +79,13 @@ public class PikeBlockEntity extends BlockEntity {
      * Used when the head above a pike is a PikeHeadBlock that stores the original block ID.
      */
     @Nullable
-    //? if fabric {
-    public static EntityType<?> getHeadTypeFromWorld(World world, BlockPos headPos) {
-        BlockEntity be = world.getBlockEntity(headPos);
-        if (!(be instanceof PikeHeadBlockEntity pikeHead)) return null;
-        String storedBlockId = pikeHead.getStoredBlockId();
-        if (storedBlockId == null || storedBlockId.isEmpty()) return null;
-        return resolveEntityType(storedBlockId);
-    }
-    //?} else {
-    /*public static EntityType<?> getHeadTypeFromWorld(Level level, BlockPos headPos) {
+    public static EntityType<?> getHeadTypeFromWorld(Level level, BlockPos headPos) {
         BlockEntity be = level.getBlockEntity(headPos);
         if (!(be instanceof PikeHeadBlockEntity pikeHead)) return null;
         String storedBlockId = pikeHead.getStoredBlockId();
         if (storedBlockId == null || storedBlockId.isEmpty()) return null;
         return resolveEntityType(storedBlockId);
     }
-    *///?}
 
     /**
      * Resolves a block ID to its mapped EntityType via config, or null if not configured
@@ -149,21 +102,12 @@ public class PikeBlockEntity extends BlockEntity {
             Effigies.LOGGER.error("Invalid entity ID format in block-entity mapping: {}", entityId);
             return null;
         }
-        //? if fabric {
-        Identifier id = Identifier.of(parts[0], parts[1]);
-        if (!Registries.ENTITY_TYPE.containsId(id)) {
-            Effigies.LOGGER.error("Entity type not found in registry for mapping {}={}: {}", blockId, entityId, id);
-            return null;
-        }
-        return Registries.ENTITY_TYPE.get(id);
-        //?} else {
-        /*Identifier id = Identifier.fromNamespaceAndPath(parts[0], parts[1]);
+        Identifier id = Identifier.fromNamespaceAndPath(parts[0], parts[1]);
         if (!BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
             Effigies.LOGGER.error("Entity type not found in registry for mapping {}={}: {}", blockId, entityId, id);
             return null;
         }
         return BuiltInRegistries.ENTITY_TYPE.getValue(id);
-        *///?}
     }
 
     private static boolean isModLoaded(String modId) {
@@ -189,17 +133,10 @@ public class PikeBlockEntity extends BlockEntity {
             String[] blockParts = blockIdStr.split(":", 2);
             String[] entityParts = entityIdStr.split(":", 2);
 
-            //? if fabric {
-            Identifier blockId = Identifier.of(blockParts[0], blockParts[1]);
-            Identifier entityId = Identifier.of(entityParts[0], entityParts[1]);
-            boolean blockExists = Registries.BLOCK.containsId(blockId);
-            boolean entityExists = Registries.ENTITY_TYPE.containsId(entityId);
-            //?} else {
-            /*Identifier blockId = Identifier.fromNamespaceAndPath(blockParts[0], blockParts[1]);
+            Identifier blockId = Identifier.fromNamespaceAndPath(blockParts[0], blockParts[1]);
             Identifier entityId = Identifier.fromNamespaceAndPath(entityParts[0], entityParts[1]);
             boolean blockExists = BuiltInRegistries.BLOCK.containsKey(blockId);
             boolean entityExists = BuiltInRegistries.ENTITY_TYPE.containsKey(entityId);
-            *///?}
 
             if (!blockExists) {
                 invalidCount++;

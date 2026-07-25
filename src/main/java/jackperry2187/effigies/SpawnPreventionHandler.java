@@ -1,33 +1,30 @@
 package jackperry2187.effigies;
 
-//? if fabric {
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-// Debug imports - uncomment when re-enabling debug messages
-// import net.minecraft.registry.Registries;
-// import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-// import net.minecraft.text.Text;
-// import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.particle.ParticleTypes;
-//?} else {
-/*// Debug imports - uncomment when re-enabling debug messages
-// import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-// import net.minecraft.core.registries.BuiltInRegistries;
-// import net.minecraft.network.chat.Component;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-// import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.core.particles.ParticleTypes;
+// Debug imports - uncomment when re-enabling debug messages
+// import net.minecraft.ChatFormatting;
+// import net.minecraft.core.registries.BuiltInRegistries;
+// import net.minecraft.network.chat.Component;
+// import net.minecraft.server.level.ServerPlayer;
+
+//? if fabric {
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+//?}
+
+//? if mc12011 && fabric {
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+//?} else if mc261 && fabric {
+/*import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
+*///?}
+
+//? if neoforge {
+/*import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
@@ -59,36 +56,54 @@ public final class SpawnPreventionHandler {
     public static void registerFabric() {
         // Register mob spawn prevention
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
-            if (!(entity instanceof MobEntity mob)) {
+            if (!(entity instanceof Mob mob)) {
                 return;
             }
-            if (!(level instanceof ServerWorld serverWorld)) {
+            if (!(level instanceof ServerLevel serverLevel)) {
                 return;
             }
-            if (mob.age > 0) {
+            if (mob.tickCount > 0) {
                 return;
             }
-            if (isSpawnBlocked(serverWorld, mob.getBlockPos(), mob.getType())) {
+            if (isSpawnBlocked(serverLevel, mob.blockPosition(), mob.getType())) {
                 mob.discard();
             }
         });
 
         // Register chunk load event to scan for active pikes
+        //? if mc12011 {
         ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            if (chunk instanceof WorldChunk worldChunk) {
-                PikeRegistry.onChunkLoad(world, worldChunk);
+            if (chunk instanceof LevelChunk levelChunk) {
+                PikeRegistry.onChunkLoad(world, levelChunk);
             }
         });
+        //?} else {
+        /*ServerChunkEvents.CHUNK_LOAD.register((world, chunk, generated) -> {
+            if (chunk instanceof LevelChunk levelChunk) {
+                PikeRegistry.onChunkLoad(world, levelChunk);
+            }
+        });
+        *///?}
 
         // Register chunk unload event to clear pikes from registry
         ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+            //? if mc12011 {
             PikeRegistry.onChunkUnload(world, chunk.getPos().x, chunk.getPos().z);
+            //?} else {
+            /*PikeRegistry.onChunkUnload(world, chunk.getPos().x(), chunk.getPos().z());
+            *///?}
         });
 
         // Register world unload event to clear dimension data
+        //? if mc12011 {
         ServerWorldEvents.UNLOAD.register((server, world) -> {
-            PikeRegistry.onWorldUnload(world.getRegistryKey());
+            PikeRegistry.onWorldUnload(world.dimension());
         });
+        //?} else {
+        /*ServerLevelEvents.UNLOAD.register((server, world) -> {
+            PikeRegistry.onWorldUnload(world.dimension());
+        });
+        *///?}
     }
     //?} else {
     /*@SubscribeEvent
@@ -124,7 +139,11 @@ public final class SpawnPreventionHandler {
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
             return;
         }
+        //? if mc12011 {
         PikeRegistry.onChunkUnload(serverLevel, event.getChunk().getPos().x, event.getChunk().getPos().z);
+        //?} else {
+        PikeRegistry.onChunkUnload(serverLevel, event.getChunk().getPos().x(), event.getChunk().getPos().z());
+        //?}
     }
 
     @SubscribeEvent
@@ -136,53 +155,7 @@ public final class SpawnPreventionHandler {
     }
     *///?}
 
-    //? if fabric {
-    private static boolean isSpawnBlocked(ServerWorld level, BlockPos spawnPos, EntityType<?> entityType) {
-        if (antiPikeBypass) {
-            return false;
-        }
-
-        // Use the efficient pike registry for spawn checking
-        PikeRegistry.PikeData blockingPike = PikeRegistry.getBlockingPike(level, spawnPos, entityType);
-        
-        if (blockingPike != null) {
-            // Spawn particles at the pike to indicate it blocked a spawn
-            BlockPos pikePos = blockingPike.pos();
-            level.spawnParticles(
-                ParticleTypes.FLAME,
-                pikePos.getX() + 0.5,
-                pikePos.getY() + 1.5,  // At head height
-                pikePos.getZ() + 0.5,
-                1,      // particle count
-                0.3,    // deltaX
-                0.3,    // deltaY
-                0.3,    // deltaZ
-                0.0     // speed
-            );
-
-            // Debug: Send message to nearby players (commented out for release)
-            // String entityName = Registries.ENTITY_TYPE.getId(entityType).getPath();
-            // for (ServerPlayerEntity player : level.getPlayers()) {
-            //     if (player.squaredDistanceTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()) <= 64 * 64) {
-            //         player.sendMessage(
-            //             Text.literal("[Effigies] ").formatted(Formatting.GOLD)
-            //                 .append(Text.literal("Prevented ").formatted(Formatting.RED))
-            //                 .append(Text.literal(entityName).formatted(Formatting.YELLOW))
-            //                 .append(Text.literal(" spawn at ").formatted(Formatting.RED))
-            //                 .append(Text.literal("(" + spawnPos.getX() + ", " + spawnPos.getY() + ", " + spawnPos.getZ() + ")").formatted(Formatting.AQUA))
-            //                 .append(Text.literal(" due to effigy at ").formatted(Formatting.RED))
-            //                 .append(Text.literal("(" + pikePos.getX() + ", " + pikePos.getY() + ", " + pikePos.getZ() + ")").formatted(Formatting.AQUA)),
-            //             false
-            //         );
-            //     }
-            // }
-            return true;
-        }
-
-        return false;
-    }
-    //?} else {
-    /*private static boolean isSpawnBlocked(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
+    private static boolean isSpawnBlocked(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
         if (antiPikeBypass) {
             return false;
         }
@@ -226,5 +199,4 @@ public final class SpawnPreventionHandler {
 
         return false;
     }
-    *///?}
 }

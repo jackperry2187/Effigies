@@ -8,8 +8,8 @@ Effigies supports multiple Minecraft versions and mod loaders:
 
 | Loader | Minecraft Versions |
 |--------|-------------------|
-| **Fabric** | 1.21.11+ |
-| **NeoForge** | 1.21.11+ |
+| **Fabric** | 1.21.11, 26.1 |
+| **NeoForge** | 1.21.11, 26.1 |
 
 ## Features  
   

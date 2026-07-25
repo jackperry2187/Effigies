@@ -11,15 +11,18 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5+"
+    id("dev.kikugie.stonecutter") version "0.9"
 }
 
 stonecutter {
     centralScript = "build.gradle.kts"
     kotlinController = true
-    
+
     create(rootProject) {
-        versions("1.21.11-fabric", "1.21.11-neoforge")
+        version("1.21.11-fabric", "1.21.11")
+        version("1.21.11-neoforge", "1.21.11")
+        version("26.1-fabric", "26.1")
+        version("26.1-neoforge", "26.1")
         vcsVersion = "1.21.11-fabric"
     }
 }

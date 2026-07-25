@@ -6,9 +6,9 @@ import jackperry2187.effigies.block.entity.PikeBlockEntity;
 import jackperry2187.effigies.block.entity.PikeHeadBlockEntity;
 //? if fabric {
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 //?} else {
 /*import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -28,7 +28,7 @@ public final class ModBlockEntities {
 
     public static void register() {
         PIKE = Registry.register(
-            Registries.BLOCK_ENTITY_TYPE,
+            BuiltInRegistries.BLOCK_ENTITY_TYPE,
             Effigies.id("pike"),
             FabricBlockEntityTypeBuilder.create(PikeBlockEntity::new,
                 ModBlocks.woodenPike(),
@@ -41,14 +41,14 @@ public final class ModBlockEntities {
             ).build()
         );
         PIKE_HEAD = Registry.register(
-            Registries.BLOCK_ENTITY_TYPE,
+            BuiltInRegistries.BLOCK_ENTITY_TYPE,
             Effigies.id("pike_head"),
             FabricBlockEntityTypeBuilder.create(PikeHeadBlockEntity::new,
                 ModBlocks.pikeHead()
             ).build()
         );
         ANTI_PIKE = Registry.register(
-            Registries.BLOCK_ENTITY_TYPE,
+            BuiltInRegistries.BLOCK_ENTITY_TYPE,
             Effigies.id("anti_pike"),
             FabricBlockEntityTypeBuilder.create(AntiPikeBlockEntity::new,
                 ModBlocks.antiPike()

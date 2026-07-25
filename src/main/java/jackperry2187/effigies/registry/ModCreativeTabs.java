@@ -1,14 +1,19 @@
 package jackperry2187.effigies.registry;
 
 import jackperry2187.effigies.Effigies;
-//? if fabric {
+//? if mc12011 && fabric {
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+//?} else if mc261 && fabric {
+/*import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+*///?}
+
+//? if fabric {
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 //?} else {
 /*import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -24,33 +29,37 @@ public final class ModCreativeTabs {
     }
 
     //? if fabric {
-    private static ItemGroup EFFIGIES_TAB;
+    private static CreativeModeTab EFFIGIES_TAB;
 
     public static void register() {
         Identifier tabId = Effigies.id("effigies");
         EFFIGIES_TAB = Registry.register(
-            Registries.ITEM_GROUP,
+            BuiltInRegistries.CREATIVE_MODE_TAB,
             tabId,
+            //? if mc12011 && fabric {
             FabricItemGroup.builder()
+            //?} else if mc261 && fabric {
+            /*FabricCreativeModeTab.builder()
+            *///?}
                 .icon(() -> new ItemStack(ModBlocks.woodenPike()))
-                .displayName(Text.translatable("itemGroup.effigies"))
-                .entries((context, entries) -> {
-                    entries.add(ModBlocks.woodenPike());
-                    entries.add(ModBlocks.stonePike());
-                    entries.add(ModBlocks.copperPike());
-                    entries.add(ModBlocks.ironPike());
-                    entries.add(ModBlocks.goldenPike());
-                    entries.add(ModBlocks.diamondPike());
-                    entries.add(ModBlocks.netheritePike());
-                    entries.add(ModItems.antiSpear());
-                    entries.add(ModBlocks.antiPike());
-                    entries.add(ModItems.grimoire());
+                .title(Component.translatable("itemGroup.effigies"))
+                .displayItems((parameters, output) -> {
+                    output.accept(ModBlocks.woodenPike());
+                    output.accept(ModBlocks.stonePike());
+                    output.accept(ModBlocks.copperPike());
+                    output.accept(ModBlocks.ironPike());
+                    output.accept(ModBlocks.goldenPike());
+                    output.accept(ModBlocks.diamondPike());
+                    output.accept(ModBlocks.netheritePike());
+                    output.accept(ModItems.antiSpear());
+                    output.accept(ModBlocks.antiPike());
+                    output.accept(ModItems.grimoire());
                 })
                 .build()
         );
     }
 
-    public static ItemGroup effigiesTab() {
+    public static CreativeModeTab effigiesTab() {
         return EFFIGIES_TAB;
     }
     //?} else {

@@ -6,21 +6,14 @@ import java.util.UUID;
 
 import com.mojang.serialization.Codec;
 
-//? if fabric {
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
-//?} else {
-/*import net.minecraft.server.MinecraftServer;
+//? if mc261 {
+/*import net.minecraft.resources.Identifier;
+*///?}
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-*///?}
 
-//? if fabric {
-public class GrimoireTracker extends PersistentState {
-//?} else {
-/*public class GrimoireTracker extends SavedData {
-*///?}
+public class GrimoireTracker extends SavedData {
 
     private final Set<UUID> givenPlayers;
 
@@ -50,21 +43,16 @@ public class GrimoireTracker extends PersistentState {
             )
             .codec();
 
-    //? if fabric {
-    public static final PersistentStateType<GrimoireTracker> TYPE = new PersistentStateType<>(
+    public static final SavedDataType<GrimoireTracker> TYPE = new SavedDataType<>(
+        //? if mc12011 {
         "effigies_grimoire_tracker",
+        //?} else {
+        /*Identifier.fromNamespaceAndPath("effigies", "grimoire_tracker"),
+        *///?}
         GrimoireTracker::new,
         CODEC,
         null
     );
-    //?} else {
-    /*public static final SavedDataType<GrimoireTracker> TYPE = new SavedDataType<>(
-        "effigies_grimoire_tracker",
-        GrimoireTracker::new,
-        CODEC,
-        null
-    );
-    *///?}
 
     public boolean hasReceivedGrimoire(UUID playerUuid) {
         return givenPlayers.contains(playerUuid);
@@ -72,18 +60,10 @@ public class GrimoireTracker extends PersistentState {
 
     public void markGrimoireGiven(UUID playerUuid) {
         givenPlayers.add(playerUuid);
-        //? if fabric {
-        markDirty();
-        //?} else {
-        /*setDirty();
-        *///?}
+        setDirty();
     }
 
     public static GrimoireTracker get(MinecraftServer server) {
-        //? if fabric {
-        return server.getOverworld().getPersistentStateManager().getOrCreate(TYPE);
-        //?} else {
-        /*return server.overworld().getDataStorage().computeIfAbsent(TYPE);
-        *///?}
+        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 }

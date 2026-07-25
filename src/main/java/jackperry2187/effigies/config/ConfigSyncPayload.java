@@ -5,17 +5,10 @@ import jackperry2187.effigies.Effigies;
 import java.util.HashMap;
 import java.util.Map;
 
-//? if fabric {
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-//?} else {
-/*import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-*///?}
 
 /**
  * Network payload for syncing server config values to clients.
@@ -30,57 +23,9 @@ public record ConfigSyncPayload(
     int diamondPikeRadius,
     int netheritePikeRadius,
     Map<String, String> blockEntityMappings
-//? if fabric {
-) implements CustomPayload {
-//?} else {
-/*) implements CustomPacketPayload {
-*///?}
+) implements CustomPacketPayload {
 
-    //? if fabric {
-    public static final Id<ConfigSyncPayload> ID = new Id<>(Identifier.of(Effigies.MOD_ID, "config_sync"));
-
-    public static final PacketCodec<RegistryByteBuf, ConfigSyncPayload> CODEC = new PacketCodec<>() {
-        @Override
-        public ConfigSyncPayload decode(RegistryByteBuf buf) {
-            int wooden = buf.readInt();
-            int stone = buf.readInt();
-            int copper = buf.readInt();
-            int iron = buf.readInt();
-            int golden = buf.readInt();
-            int diamond = buf.readInt();
-            int netherite = buf.readInt();
-            int mappingCount = buf.readInt();
-            Map<String, String> mappings = new HashMap<>(mappingCount);
-            for (int i = 0; i < mappingCount; i++) {
-                mappings.put(buf.readString(), buf.readString());
-            }
-            return new ConfigSyncPayload(wooden, stone, copper, iron, golden, diamond, netherite, mappings);
-        }
-
-        @Override
-        public void encode(RegistryByteBuf buf, ConfigSyncPayload value) {
-            buf.writeInt(value.woodenPikeRadius());
-            buf.writeInt(value.stonePikeRadius());
-            buf.writeInt(value.copperPikeRadius());
-            buf.writeInt(value.ironPikeRadius());
-            buf.writeInt(value.goldenPikeRadius());
-            buf.writeInt(value.diamondPikeRadius());
-            buf.writeInt(value.netheritePikeRadius());
-            Map<String, String> mappings = value.blockEntityMappings();
-            buf.writeInt(mappings.size());
-            for (Map.Entry<String, String> entry : mappings.entrySet()) {
-                buf.writeString(entry.getKey());
-                buf.writeString(entry.getValue());
-            }
-        }
-    };
-
-    @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
-    }
-    //?} else {
-    /*public static final Type<ConfigSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Effigies.MOD_ID, "config_sync"));
+    public static final Type<ConfigSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Effigies.MOD_ID, "config_sync"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigSyncPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
@@ -122,7 +67,6 @@ public record ConfigSyncPayload(
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
-    *///?}
 
     public static ConfigSyncPayload fromCurrentConfig() {
         return new ConfigSyncPayload(

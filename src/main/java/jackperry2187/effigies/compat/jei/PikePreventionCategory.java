@@ -13,21 +13,16 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
 
-//? if fabric {
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+//? if mc12011 {
+import net.minecraft.client.gui.GuiGraphics;
 //?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-*///?}
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
 
 public class PikePreventionCategory implements IRecipeCategory<PikePreventionRecipe> {
 
@@ -60,17 +55,10 @@ public class PikePreventionCategory implements IRecipeCategory<PikePreventionRec
         return RECIPE_TYPE;
     }
 
-    //? if fabric {
     @Override
-    public Text getTitle() {
-        return Text.translatable("effigies.jei.pike_prevention");
-    }
-    //?} else {
-    /*@Override
     public Component getTitle() {
         return Component.translatable("effigies.jei.pike_prevention");
     }
-    *///?}
 
     @Override
     public int getWidth() {
@@ -89,45 +77,28 @@ public class PikePreventionCategory implements IRecipeCategory<PikePreventionRec
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PikePreventionRecipe recipe, IFocusGroup focuses) {
-        //? if fabric {
         builder.addInputSlot(PIKE_SLOT_X, PIKE_SLOT_Y)
             .addItemStacks(ModItems.getAllPikeItems().stream().map(ItemStack::new).toList());
-        //?} else {
-        /*builder.addInputSlot(PIKE_SLOT_X, PIKE_SLOT_Y)
-            .addItemStacks(ModItems.getAllPikeItems().stream().map(ItemStack::new).toList());
-        *///?}
 
         builder.addInputSlot(HEAD_SLOT_X, HEAD_SLOT_Y)
             .add(recipe.headItem());
     }
 
-    //? if fabric {
+    //? if mc12011 {
     @Override
-    public void draw(PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, DrawContext guiGraphics, double mouseX, double mouseY) {
+    public void draw(PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, ARROW_X, ARROW_Y);
         MobRenderHelper.renderEntity(guiGraphics, recipe.entityTypeId(), MOB_CENTER_X, MOB_CENTER_Y, MOB_RENDER_SIZE);
     }
     //?} else {
     /*@Override
-    public void draw(PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         arrow.draw(guiGraphics, ARROW_X, ARROW_Y);
         MobRenderHelper.renderEntity(guiGraphics, recipe.entityTypeId(), MOB_CENTER_X, MOB_CENTER_Y, MOB_RENDER_SIZE);
     }
     *///?}
 
-    //? if fabric {
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        if (isMouseOverMob(mouseX, mouseY)) {
-            Identifier id = Identifier.tryParse(recipe.entityTypeId());
-            if (id != null && Registries.ENTITY_TYPE.containsId(id)) {
-                EntityType<?> type = Registries.ENTITY_TYPE.get(id);
-                tooltip.add(type.getName());
-            }
-        }
-    }
-    //?} else {
-    /*@Override
     public void getTooltip(ITooltipBuilder tooltip, PikePreventionRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         if (isMouseOverMob(mouseX, mouseY)) {
             Identifier id = Identifier.tryParse(recipe.entityTypeId());
@@ -137,7 +108,6 @@ public class PikePreventionCategory implements IRecipeCategory<PikePreventionRec
             }
         }
     }
-    *///?}
 
     private static boolean isMouseOverMob(double mouseX, double mouseY) {
         int halfSize = MOB_RENDER_SIZE / 2;

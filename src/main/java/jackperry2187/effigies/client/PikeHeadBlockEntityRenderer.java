@@ -9,40 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-//? if fabric {
-import net.minecraft.block.AbstractSkullBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.SkullBlockEntityModel;
-import net.minecraft.client.render.block.entity.SkullBlockEntityRenderer;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.render.entity.state.WitherEntityRenderState;
-import net.minecraft.client.render.entity.model.LoadedEntityModels;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-//?} else {
-/*import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -58,7 +25,11 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.WitherRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+//? if mc12011 {
 import net.minecraft.client.renderer.state.CameraRenderState;
+//?} else {
+/*import net.minecraft.client.renderer.state.level.CameraRenderState;
+*///?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -73,182 +44,11 @@ import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-*///?}
 
 public class PikeHeadBlockEntityRenderer
-    //? if fabric {
     implements BlockEntityRenderer<PikeHeadBlockEntity, PikeHeadBlockEntityRenderer.PikeHeadRenderState>
-    //?} else {
-    /*implements BlockEntityRenderer<PikeHeadBlockEntity, PikeHeadBlockEntityRenderer.PikeHeadRenderState>
-    *///?}
 {
-    //? if fabric {
-    private final LoadedEntityModels modelLoader;
-
-    public PikeHeadBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
-        this.modelLoader = ctx.loadedEntityModels();
-    }
-
-    @Override
-    public PikeHeadRenderState createRenderState() {
-        return new PikeHeadRenderState();
-    }
-
-    @Override
-    public void updateRenderState(PikeHeadBlockEntity entity, PikeHeadRenderState state, float tickProgress,
-                                  Vec3d cameraPos, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay) {
-        BlockEntityRenderState.updateBlockEntityRenderState(entity, state, crumblingOverlay);
-        state.storedState = entity.getStoredBlockState();
-        state.rotation = entity.getRotation();
-        updateHologramState(entity, state, tickProgress);
-    }
-
-    @Override
-    public void render(PikeHeadRenderState state, MatrixStack matrices,
-                       OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
-        if (state.storedState == null) return;
-
-        float yaw = state.rotation * 22.5f;
-
-        if (state.storedState.getBlock() instanceof AbstractSkullBlock skull) {
-            SkullBlock.SkullType skullType = skull.getSkullType();
-            SkullBlockEntityModel model = SkullBlockEntityRenderer.getModels(modelLoader, skullType);
-            RenderLayer renderLayer = SkullBlockEntityRenderer.getCutoutRenderLayer(skullType, null);
-            if (model != null && renderLayer != null) {
-                SkullBlockEntityRenderer.render(null, yaw, 0f, matrices, queue,
-                    state.lightmapCoordinates, model, renderLayer, 0, state.crumblingOverlay);
-            }
-        } else {
-            var bufferSource = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-            matrices.push();
-            matrices.translate(0.5, 0.0, 0.5);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-yaw));
-            matrices.scale(0.5f, 0.5f, 0.5f);
-            matrices.translate(-0.5, 0.0, -0.5);
-            MinecraftClient.getInstance().getBlockRenderManager()
-                .renderBlockAsEntity(state.storedState, matrices, bufferSource,
-                    state.lightmapCoordinates, OverlayTexture.DEFAULT_UV);
-            bufferSource.draw();
-            matrices.pop();
-        }
-
-        if (state.isTargeted && state.mappedEntityTypeId != null) {
-            renderHologram(state, matrices, queue, cameraRenderState);
-        }
-    }
-
-    private static void updateHologramState(PikeHeadBlockEntity entity, PikeHeadRenderState state, float tickProgress) {
-        state.isTargeted = false;
-        state.mappedEntityTypeId = null;
-        state.tickProgress = tickProgress;
-
-        World world = entity.getWorld();
-        if (world == null) return;
-
-        BlockPos pikePos = entity.getPos().down();
-        BlockState pikeState = world.getBlockState(pikePos);
-        boolean isPikeActivated = (pikeState.getBlock() instanceof PikeBlock && pikeState.get(PikeBlock.ACTIVATED))
-            || (pikeState.getBlock() instanceof AntiPikeBlock && pikeState.get(AntiPikeBlock.ACTIVATED));
-        if (!isPikeActivated) return;
-
-        String storedBlockId = entity.getStoredBlockId();
-        if (storedBlockId == null || storedBlockId.isEmpty()) return;
-        String entityTypeId = ConfigSettings.getEntityIdForBlock(storedBlockId);
-        if (entityTypeId == null) return;
-
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.crosshairTarget instanceof BlockHitResult blockHit) {
-            BlockPos targetPos = blockHit.getBlockPos();
-            if (targetPos.equals(entity.getPos()) || targetPos.equals(pikePos)) {
-                state.isTargeted = true;
-                state.mappedEntityTypeId = entityTypeId;
-                state.worldTime = world.getTime() + tickProgress;
-            }
-        }
-    }
-
-    @Nullable
-    private static Entity getOrCreateEntity(String entityTypeId, World world) {
-        if (lastCachedWorld != world) {
-            entityCache.clear();
-            lastCachedWorld = world;
-        }
-
-        Entity cached = entityCache.get(entityTypeId);
-        if (cached != null) {
-            return cached;
-        }
-
-        Identifier id = Identifier.tryParse(entityTypeId);
-        if (id == null || !Registries.ENTITY_TYPE.containsId(id)) return null;
-
-        EntityType<?> type = Registries.ENTITY_TYPE.get(id);
-        Entity entity = type.create(world, SpawnReason.COMMAND);
-        if (entity != null) {
-            entityCache.put(entityTypeId, entity);
-        }
-        return entity;
-    }
-
-    private void renderHologram(PikeHeadRenderState state, MatrixStack matrices,
-                                OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.world == null) return;
-
-        Entity hologramEntity = getOrCreateEntity(state.mappedEntityTypeId, client.world);
-        if (hologramEntity == null) return;
-
-        float spinAngle = (state.worldTime * 2.0f) % 360.0f;
-
-        if (hologramEntity instanceof LivingEntity living) {
-            living.bodyYaw = 0;
-            living.lastBodyYaw = 0;
-            living.headYaw = 0;
-            living.lastHeadYaw = 0;
-            living.setYaw(0);
-        } else {
-            hologramEntity.setYaw(0);
-        }
-
-        EntityRenderManager renderManager = client.getEntityRenderDispatcher();
-        EntityRenderState entityState = renderManager.getAndUpdateRenderState(hologramEntity, state.tickProgress);
-
-        entityState.age = state.worldTime;
-
-        if (entityState instanceof LivingEntityRenderState livingState) {
-            livingState.bodyYaw = 0;
-            livingState.relativeHeadYaw = 0;
-            livingState.limbSwingAnimationProgress = 0;
-            livingState.limbSwingAmplitude = 0;
-            livingState.shaking = false;
-        }
-
-        if (entityState instanceof WitherEntityRenderState witherState) {
-            for (int i = 0; i < witherState.sideHeadYaws.length; i++) {
-                witherState.sideHeadYaws[i] = 0;
-                witherState.sideHeadPitches[i] = 0;
-            }
-        }
-
-        entityState.shadowRadius = 0;
-        entityState.displayName = null;
-        entityState.light = state.lightmapCoordinates;
-
-        float maxDisplayHeight = 1.0f;
-        float scale = Math.min(0.4f, maxDisplayHeight / Math.max(entityState.height, 0.1f));
-
-        float bobOffset = (float) Math.sin(state.worldTime * 0.1) * 0.05f;
-        matrices.push();
-        matrices.translate(0.5, 1.1 + bobOffset, 0.5);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(spinAngle));
-        matrices.scale(scale, scale, scale);
-
-        renderManager.render(entityState, cameraRenderState, 0, 0, 0, matrices, queue);
-
-        matrices.pop();
-    }
-    //?} else {
-    /*private final EntityModelSet modelSet;
+    private final EntityModelSet modelSet;
 
     public PikeHeadBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {
         this.modelSet = ctx.entityModelSet();
@@ -280,10 +80,21 @@ public class PikeHeadBlockEntityRenderer
             SkullModelBase model = SkullBlockRenderer.createModel(modelSet, skullType);
             RenderType renderType = SkullBlockRenderer.getSkullRenderType(skullType, null);
             if (model != null && renderType != null) {
+                //? if mc12011 {
                 SkullBlockRenderer.submitSkull(null, yaw, 0f, poseStack, submitNodeCollector,
                     state.lightCoords, model, renderType, 0, state.breakProgress);
+                //?} else {
+                /*poseStack.pushPose();
+                poseStack.translate(0.5F, 0.0F, 0.5F);
+                poseStack.mulPose(Axis.YP.rotationDegrees(-yaw));
+                poseStack.scale(-1.0F, -1.0F, 1.0F);
+                SkullBlockRenderer.submitSkull(0f, poseStack, submitNodeCollector,
+                    state.lightCoords, model, renderType, 0, state.breakProgress);
+                poseStack.popPose();
+                *///?}
             }
         } else {
+            //? if mc12011 {
             var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
             poseStack.pushPose();
             poseStack.translate(0.5, 0.0, 0.5);
@@ -295,6 +106,9 @@ public class PikeHeadBlockEntityRenderer
                     state.lightCoords, OverlayTexture.NO_OVERLAY);
             bufferSource.endBatch();
             poseStack.popPose();
+            //?} else {
+            /*// Minecraft.getBlockRenderer() was removed in MC 26.1; non-skull pike heads are not rendered
+            *///?}
         }
 
         if (state.isTargeted && state.mappedEntityTypeId != null) {
@@ -404,7 +218,11 @@ public class PikeHeadBlockEntityRenderer
 
         float bobOffset = (float) Math.sin(state.worldTime * 0.1) * 0.05f;
         poseStack.pushPose();
-        poseStack.translate(0.5, 1.2 + bobOffset, 0.5);
+        //? if fabric {
+        poseStack.translate(0.5, 1.1 + bobOffset, 0.5);
+        //?} else {
+        /*poseStack.translate(0.5, 1.2 + bobOffset, 0.5);
+        *///?}
         poseStack.mulPose(Axis.YP.rotationDegrees(spinAngle));
         poseStack.scale(scale, scale, scale);
 
@@ -412,18 +230,13 @@ public class PikeHeadBlockEntityRenderer
 
         poseStack.popPose();
     }
-    *///?}
 
     private static final Map<String, Entity> entityCache = new HashMap<>();
     private static Object lastCachedWorld = null;
 
     public static class PikeHeadRenderState extends BlockEntityRenderState {
         @Nullable
-        //? if fabric {
         public BlockState storedState;
-        //?} else {
-        /*public BlockState storedState;
-        *///?}
         public int rotation;
         public boolean isTargeted;
         @Nullable

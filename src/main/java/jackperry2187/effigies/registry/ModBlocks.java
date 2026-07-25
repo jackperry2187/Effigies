@@ -6,10 +6,10 @@ import jackperry2187.effigies.block.AntiPikeBlock;
 import jackperry2187.effigies.block.PikeBlock;
 import jackperry2187.effigies.block.PikeHeadBlock;
 //? if fabric {
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 //?} else {
 /*import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
@@ -34,31 +34,31 @@ public final class ModBlocks {
 
     public static void register() {
         Identifier woodenPikeId = Effigies.id("wooden_pike");
-        WOODEN_PIKE = Registry.register(Registries.BLOCK, woodenPikeId, new PikeBlock(PikeTier.WOODEN, woodenPikeId));
+        WOODEN_PIKE = Registry.register(BuiltInRegistries.BLOCK, woodenPikeId, new PikeBlock(PikeTier.WOODEN, woodenPikeId));
 
         Identifier stonePikeId = Effigies.id("stone_pike");
-        STONE_PIKE = Registry.register(Registries.BLOCK, stonePikeId, new PikeBlock(PikeTier.STONE, stonePikeId));
+        STONE_PIKE = Registry.register(BuiltInRegistries.BLOCK, stonePikeId, new PikeBlock(PikeTier.STONE, stonePikeId));
 
         Identifier copperPikeId = Effigies.id("copper_pike");
-        COPPER_PIKE = Registry.register(Registries.BLOCK, copperPikeId, new PikeBlock(PikeTier.COPPER, copperPikeId));
+        COPPER_PIKE = Registry.register(BuiltInRegistries.BLOCK, copperPikeId, new PikeBlock(PikeTier.COPPER, copperPikeId));
 
         Identifier ironPikeId = Effigies.id("iron_pike");
-        IRON_PIKE = Registry.register(Registries.BLOCK, ironPikeId, new PikeBlock(PikeTier.IRON, ironPikeId));
+        IRON_PIKE = Registry.register(BuiltInRegistries.BLOCK, ironPikeId, new PikeBlock(PikeTier.IRON, ironPikeId));
 
         Identifier goldenPikeId = Effigies.id("golden_pike");
-        GOLDEN_PIKE = Registry.register(Registries.BLOCK, goldenPikeId, new PikeBlock(PikeTier.GOLDEN, goldenPikeId));
+        GOLDEN_PIKE = Registry.register(BuiltInRegistries.BLOCK, goldenPikeId, new PikeBlock(PikeTier.GOLDEN, goldenPikeId));
 
         Identifier diamondPikeId = Effigies.id("diamond_pike");
-        DIAMOND_PIKE = Registry.register(Registries.BLOCK, diamondPikeId, new PikeBlock(PikeTier.DIAMOND, diamondPikeId));
+        DIAMOND_PIKE = Registry.register(BuiltInRegistries.BLOCK, diamondPikeId, new PikeBlock(PikeTier.DIAMOND, diamondPikeId));
 
         Identifier netheritePikeId = Effigies.id("netherite_pike");
-        NETHERITE_PIKE = Registry.register(Registries.BLOCK, netheritePikeId, new PikeBlock(PikeTier.NETHERITE, netheritePikeId));
+        NETHERITE_PIKE = Registry.register(BuiltInRegistries.BLOCK, netheritePikeId, new PikeBlock(PikeTier.NETHERITE, netheritePikeId));
 
         Identifier pikeHeadId = Effigies.id("pike_head");
-        PIKE_HEAD = Registry.register(Registries.BLOCK, pikeHeadId, new PikeHeadBlock(pikeHeadId));
+        PIKE_HEAD = Registry.register(BuiltInRegistries.BLOCK, pikeHeadId, new PikeHeadBlock(pikeHeadId));
 
         Identifier antiPikeId = Effigies.id("anti_pike");
-        ANTI_PIKE = Registry.register(Registries.BLOCK, antiPikeId, new AntiPikeBlock(antiPikeId));
+        ANTI_PIKE = Registry.register(BuiltInRegistries.BLOCK, antiPikeId, new AntiPikeBlock(antiPikeId));
     }
 
     public static Block woodenPike() {

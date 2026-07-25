@@ -17,8 +17,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerPlayer;
 
 public class EffigiesFabric implements ModInitializer {
     @Override
@@ -37,18 +37,22 @@ public class EffigiesFabric implements ModInitializer {
         SpawnPreventionHandler.registerFabric();
 
         // Register config sync payload and send to players on join
-        PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.ID, ConfigSyncPayload.CODEC);
+        //? if mc12011 {
+        PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC);
+        //?} else {
+        /*PayloadTypeRegistry.clientboundPlay().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC);
+        *///?}
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayNetworking.send(handler.player, ConfigSyncPayload.fromCurrentConfig());
 
-            ServerPlayerEntity player = handler.player;
+            ServerPlayer player = handler.player;
             GrimoireTracker tracker = GrimoireTracker.get(server);
-            if (!tracker.hasReceivedGrimoire(player.getUuid())) {
+            if (!tracker.hasReceivedGrimoire(player.getUUID())) {
                 ItemStack grimoire = new ItemStack(ModItems.grimoire());
-                if (!player.getInventory().insertStack(grimoire)) {
-                    player.dropItem(grimoire, false);
+                if (!player.getInventory().add(grimoire)) {
+                    player.drop(grimoire, false);
                 }
-                tracker.markGrimoireGiven(player.getUuid());
+                tracker.markGrimoireGiven(player.getUUID());
                 Effigies.LOGGER.info("Gave grimoire to player {}", player.getName().getString());
             }
         });
