@@ -1,5 +1,7 @@
 package jackperry2187.effigies;
 
+import jackperry2187.effigies.config.ConfigSettings;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -157,6 +159,11 @@ public final class SpawnPreventionHandler {
 
     private static boolean isSpawnBlocked(ServerLevel level, BlockPos spawnPos, EntityType<?> entityType) {
         if (antiPikeBypass) {
+            return false;
+        }
+
+        // Only apply spawn prevention in whitelisted dimensions (empty whitelist = all)
+        if (!ConfigSettings.isDimensionAllowed(level.dimension().identifier().toString())) {
             return false;
         }
 

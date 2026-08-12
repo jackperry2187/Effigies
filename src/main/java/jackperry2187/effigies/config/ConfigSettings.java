@@ -6,8 +6,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,8 +32,18 @@ public final class ConfigSettings {
     public static int diamondPikeRadius;
     public static int netheritePikeRadius;
 
+    // Anti-Pike spawning behavior
+    public static int antiPikeMinSpawnDelay;
+    public static int antiPikeMaxSpawnDelay;
+    public static int antiPikeMaxNearbyEntities;
+    public static int antiPikeSpawnRange;
+    public static int antiPikeActivationRange;
+
     // Block ID -> Entity ID mappings (e.g. "minecraft:skeleton_skull" -> "minecraft:skeleton")
     private static Map<String, String> blockToEntityMappings = new HashMap<>();
+
+    // Dimensions where spawn prevention is allowed (empty = all dimensions)
+    private static List<String> dimensionWhitelist = new ArrayList<>();
 
     /**
      * Returns true if the config has been initialized.
@@ -88,6 +100,22 @@ public final class ConfigSettings {
     }
 
     /**
+     * Returns an unmodifiable view of the dimension whitelist.
+     * An empty list means spawn prevention applies in all dimensions.
+     */
+    public static List<String> getDimensionWhitelist() {
+        return Collections.unmodifiableList(dimensionWhitelist);
+    }
+
+    /**
+     * Returns true if spawn prevention is allowed to work in the given dimension.
+     * An empty whitelist means all dimensions are allowed.
+     */
+    public static boolean isDimensionAllowed(String dimensionId) {
+        return dimensionWhitelist.isEmpty() || dimensionWhitelist.contains(dimensionId);
+    }
+
+    /**
      * Initializes config values by reading from the config file.
      * Should be called after InitializeConfig.generateConfigFile().
      */
@@ -121,7 +149,13 @@ public final class ConfigSettings {
         goldenPikeRadius = payload.goldenPikeRadius();
         diamondPikeRadius = payload.diamondPikeRadius();
         netheritePikeRadius = payload.netheritePikeRadius();
+        antiPikeMinSpawnDelay = payload.antiPikeMinSpawnDelay();
+        antiPikeMaxSpawnDelay = payload.antiPikeMaxSpawnDelay();
+        antiPikeMaxNearbyEntities = payload.antiPikeMaxNearbyEntities();
+        antiPikeSpawnRange = payload.antiPikeSpawnRange();
+        antiPikeActivationRange = payload.antiPikeActivationRange();
         blockToEntityMappings = new HashMap<>(payload.blockEntityMappings());
+        dimensionWhitelist = new ArrayList<>(payload.dimensionWhitelist());
         Effigies.LOGGER.info("Config synced from server: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}, mappings={}",
             woodenPikeRadius, stonePikeRadius, copperPikeRadius, ironPikeRadius,
             goldenPikeRadius, diamondPikeRadius, netheritePikeRadius, blockToEntityMappings.size());
@@ -156,6 +190,11 @@ public final class ConfigSettings {
         goldenPikeRadius = DefaultSettings.GOLDEN_PIKE_RADIUS;
         diamondPikeRadius = DefaultSettings.DIAMOND_PIKE_RADIUS;
         netheritePikeRadius = DefaultSettings.NETHERITE_PIKE_RADIUS;
+        antiPikeMinSpawnDelay = DefaultSettings.ANTI_PIKE_MIN_SPAWN_DELAY;
+        antiPikeMaxSpawnDelay = DefaultSettings.ANTI_PIKE_MAX_SPAWN_DELAY;
+        antiPikeMaxNearbyEntities = DefaultSettings.ANTI_PIKE_MAX_NEARBY_ENTITIES;
+        antiPikeSpawnRange = DefaultSettings.ANTI_PIKE_SPAWN_RANGE;
+        antiPikeActivationRange = DefaultSettings.ANTI_PIKE_ACTIVATION_RANGE;
 
         // Populate default block-to-entity mappings
         blockToEntityMappings = new HashMap<>();
@@ -165,6 +204,9 @@ public final class ConfigSettings {
                 blockToEntityMappings.put(parts[0].trim(), parts[1].trim());
             }
         }
+
+        // Populate default dimension whitelist
+        dimensionWhitelist = new ArrayList<>(DefaultSettings.DIMENSION_WHITELIST);
 
         try {
             boolean foundMappings = false;
@@ -178,7 +220,10 @@ public final class ConfigSettings {
                     if (parts.length == 2) {
                         String key = parts[0].trim();
                         String value = parts[1].trim();
-                        if (key.contains(":")) {
+                        if (key.equals("dimension_whitelist")) {
+                            // Comma-separated list of namespace:dimension IDs (may contain colons)
+                            parseDimensionWhitelist(value);
+                        } else if (key.contains(":")) {
                             // Block-to-entity mapping (namespace:id format)
                             if (!isValidNamespacedId(key)) {
                                 Effigies.LOGGER.error("Invalid block ID format in mapping: '{}={}' (expected namespace:id instead of {})", key, value, key);
@@ -210,7 +255,10 @@ public final class ConfigSettings {
         Effigies.LOGGER.info("Pike radii: wooden={}, stone={}, copper={}, iron={}, golden={}, diamond={}, netherite={}",
             woodenPikeRadius, stonePikeRadius, copperPikeRadius, ironPikeRadius,
             goldenPikeRadius, diamondPikeRadius, netheritePikeRadius);
+        Effigies.LOGGER.info("Anti-Pike: minSpawnDelay={}, maxSpawnDelay={}, maxNearbyEntities={}, spawnRange={}, activationRange={}",
+            antiPikeMinSpawnDelay, antiPikeMaxSpawnDelay, antiPikeMaxNearbyEntities, antiPikeSpawnRange, antiPikeActivationRange);
         Effigies.LOGGER.info("Block-to-entity mappings: {}", blockToEntityMappings);
+        Effigies.LOGGER.info("Dimension whitelist: {}", dimensionWhitelist.isEmpty() ? "(all dimensions)" : dimensionWhitelist);
     }
 
     /**
@@ -228,6 +276,11 @@ public final class ConfigSettings {
                 case "golden_pike_radius" -> goldenPikeRadius = parseRadius(value, "golden", DefaultSettings.GOLDEN_PIKE_RADIUS);
                 case "diamond_pike_radius" -> diamondPikeRadius = parseRadius(value, "diamond", DefaultSettings.DIAMOND_PIKE_RADIUS);
                 case "netherite_pike_radius" -> netheritePikeRadius = parseRadius(value, "netherite", DefaultSettings.NETHERITE_PIKE_RADIUS);
+                case "anti_pike_min_spawn_delay" -> antiPikeMinSpawnDelay = parsePositiveInt(value, "anti_pike_min_spawn_delay", DefaultSettings.ANTI_PIKE_MIN_SPAWN_DELAY);
+                case "anti_pike_max_spawn_delay" -> antiPikeMaxSpawnDelay = parsePositiveInt(value, "anti_pike_max_spawn_delay", DefaultSettings.ANTI_PIKE_MAX_SPAWN_DELAY);
+                case "anti_pike_max_nearby_entities" -> antiPikeMaxNearbyEntities = parsePositiveInt(value, "anti_pike_max_nearby_entities", DefaultSettings.ANTI_PIKE_MAX_NEARBY_ENTITIES);
+                case "anti_pike_spawn_range" -> antiPikeSpawnRange = parsePositiveInt(value, "anti_pike_spawn_range", DefaultSettings.ANTI_PIKE_SPAWN_RANGE);
+                case "anti_pike_activation_range" -> antiPikeActivationRange = parsePositiveInt(value, "anti_pike_activation_range", DefaultSettings.ANTI_PIKE_ACTIVATION_RANGE);
                 default -> Effigies.LOGGER.warn("Unknown config key '{}' with value '{}', ignoring", key, value);
             }
         } catch (NumberFormatException e) {
@@ -247,6 +300,40 @@ public final class ConfigSettings {
             return defaultValue;
         }
         return radius;
+    }
+
+    /**
+     * Parses a value that must be a positive integer (>= 1).
+     * Invalid or non-positive values fall back to the default.
+     */
+    private static int parsePositiveInt(String value, String keyName, int defaultValue) {
+        int parsed = Integer.parseInt(value);
+        if (parsed < 1) {
+            Effigies.LOGGER.warn("Invalid value for {}: {} (must be >= 1), using default: {}",
+                keyName, parsed, defaultValue);
+            return defaultValue;
+        }
+        return parsed;
+    }
+
+    /**
+     * Parses a comma-separated list of namespace:dimension IDs into the whitelist.
+     * An empty value results in an empty whitelist (all dimensions allowed).
+     */
+    private static void parseDimensionWhitelist(String value) {
+        List<String> parsed = new ArrayList<>();
+        if (!value.isEmpty()) {
+            for (String entry : value.split(",")) {
+                String id = entry.trim();
+                if (id.isEmpty()) continue;
+                if (!isValidNamespacedId(id)) {
+                    Effigies.LOGGER.error("Invalid dimension ID in dimension_whitelist: '{}' (expected namespace:id)", id);
+                    continue;
+                }
+                parsed.add(id);
+            }
+        }
+        dimensionWhitelist = parsed;
     }
 
     /**

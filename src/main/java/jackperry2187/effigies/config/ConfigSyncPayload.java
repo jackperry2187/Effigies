@@ -2,7 +2,9 @@ package jackperry2187.effigies.config;
 
 import jackperry2187.effigies.Effigies;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,7 +25,13 @@ public record ConfigSyncPayload(
     int goldenPikeRadius,
     int diamondPikeRadius,
     int netheritePikeRadius,
-    Map<String, String> blockEntityMappings
+    int antiPikeMinSpawnDelay,
+    int antiPikeMaxSpawnDelay,
+    int antiPikeMaxNearbyEntities,
+    int antiPikeSpawnRange,
+    int antiPikeActivationRange,
+    Map<String, String> blockEntityMappings,
+    List<String> dimensionWhitelist
 ) implements CustomPacketPayload {
 
     public static final Type<ConfigSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Effigies.MOD_ID, "config_sync"));
@@ -39,12 +47,23 @@ public record ConfigSyncPayload(
             int golden = buf.readInt();
             int diamond = buf.readInt();
             int netherite = buf.readInt();
+            int antiMinDelay = buf.readInt();
+            int antiMaxDelay = buf.readInt();
+            int antiMaxNearby = buf.readInt();
+            int antiSpawnRange = buf.readInt();
+            int antiActivationRange = buf.readInt();
             int mappingCount = buf.readInt();
             Map<String, String> mappings = new HashMap<>(mappingCount);
             for (int i = 0; i < mappingCount; i++) {
                 mappings.put(buf.readUtf(), buf.readUtf());
             }
-            return new ConfigSyncPayload(giveGrimoire, wooden, stone, copper, iron, golden, diamond, netherite, mappings);
+            int whitelistCount = buf.readInt();
+            List<String> whitelist = new ArrayList<>(whitelistCount);
+            for (int i = 0; i < whitelistCount; i++) {
+                whitelist.add(buf.readUtf());
+            }
+            return new ConfigSyncPayload(giveGrimoire, wooden, stone, copper, iron, golden, diamond, netherite,
+                antiMinDelay, antiMaxDelay, antiMaxNearby, antiSpawnRange, antiActivationRange, mappings, whitelist);
         }
 
         @Override
@@ -57,11 +76,21 @@ public record ConfigSyncPayload(
             buf.writeInt(value.goldenPikeRadius());
             buf.writeInt(value.diamondPikeRadius());
             buf.writeInt(value.netheritePikeRadius());
+            buf.writeInt(value.antiPikeMinSpawnDelay());
+            buf.writeInt(value.antiPikeMaxSpawnDelay());
+            buf.writeInt(value.antiPikeMaxNearbyEntities());
+            buf.writeInt(value.antiPikeSpawnRange());
+            buf.writeInt(value.antiPikeActivationRange());
             Map<String, String> mappings = value.blockEntityMappings();
             buf.writeInt(mappings.size());
             for (Map.Entry<String, String> entry : mappings.entrySet()) {
                 buf.writeUtf(entry.getKey());
                 buf.writeUtf(entry.getValue());
+            }
+            List<String> whitelist = value.dimensionWhitelist();
+            buf.writeInt(whitelist.size());
+            for (String dimension : whitelist) {
+                buf.writeUtf(dimension);
             }
         }
     };
@@ -81,7 +110,13 @@ public record ConfigSyncPayload(
             ConfigSettings.goldenPikeRadius,
             ConfigSettings.diamondPikeRadius,
             ConfigSettings.netheritePikeRadius,
-            ConfigSettings.getBlockToEntityMappings()
+            ConfigSettings.antiPikeMinSpawnDelay,
+            ConfigSettings.antiPikeMaxSpawnDelay,
+            ConfigSettings.antiPikeMaxNearbyEntities,
+            ConfigSettings.antiPikeSpawnRange,
+            ConfigSettings.antiPikeActivationRange,
+            ConfigSettings.getBlockToEntityMappings(),
+            ConfigSettings.getDimensionWhitelist()
         );
     }
 }

@@ -21,6 +21,17 @@ public final class DefaultSettings {
     public static final boolean GIVE_GRIMOIRE_ON_JOIN = true;
 
     /**
+     * Anti-Pike spawning behavior.
+     * Delays are measured in ticks (20 ticks = 1 second).
+     * Ranges are measured in blocks.
+     */
+    public static final int ANTI_PIKE_MIN_SPAWN_DELAY = 100;
+    public static final int ANTI_PIKE_MAX_SPAWN_DELAY = 400;
+    public static final int ANTI_PIKE_MAX_NEARBY_ENTITIES = 6;
+    public static final int ANTI_PIKE_SPAWN_RANGE = 4;
+    public static final int ANTI_PIKE_ACTIVATION_RANGE = 16;
+
+    /**
      * Default chunk radius for each pike tier.
      * Radius of -1 = disabled (pike never blocks spawns).
      * Radius of 0 = only the chunk the pike is in.
@@ -45,4 +56,11 @@ public final class DefaultSettings {
         "minecraft:creeper_head=minecraft:creeper",
         "minecraft:piglin_head=minecraft:piglin"
     );
+
+    /**
+     * Dimensions where spawn prevention is allowed to work.
+     * An empty list means all dimensions are affected.
+     * Format: "namespace:dimension_id" (e.g. "minecraft:overworld")
+     */
+    public static final List<String> DIMENSION_WHITELIST = List.of();
 }

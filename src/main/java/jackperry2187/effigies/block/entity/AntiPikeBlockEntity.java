@@ -2,6 +2,7 @@ package jackperry2187.effigies.block.entity;
 
 import jackperry2187.effigies.SpawnPreventionHandler;
 import jackperry2187.effigies.block.AntiPikeBlock;
+import jackperry2187.effigies.config.ConfigSettings;
 import jackperry2187.effigies.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
@@ -17,12 +18,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 public class AntiPikeBlockEntity extends BlockEntity {
-    private static final int MIN_SPAWN_DELAY = 100;
-    private static final int MAX_SPAWN_DELAY = 400;
     private static final int MAX_ATTEMPTS_PER_MOB = 4;
-    private static final int SPAWN_RANGE = 4;
-    private static final int MAX_NEARBY_ENTITIES = 6;
-    private static final int ACTIVATION_RANGE = 16;
     private static final int AMBIENT_PARTICLE_MIN_INTERVAL = 15;
     private static final int AMBIENT_PARTICLE_MAX_INTERVAL = 30;
 
@@ -45,7 +41,7 @@ public class AntiPikeBlockEntity extends BlockEntity {
         }
 
         boolean playerNearby = level.hasNearbyAlivePlayer(
-            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, ACTIVATION_RANGE
+            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, ConfigSettings.antiPikeActivationRange
         );
         if (!playerNearby) {
             return;
@@ -55,12 +51,13 @@ public class AntiPikeBlockEntity extends BlockEntity {
         boolean canSpawn = entityType != null;
 
         if (canSpawn) {
+            int spawnRange = ConfigSettings.antiPikeSpawnRange;
             AABB nearbyBox = new AABB(
-                pos.getX() - SPAWN_RANGE, pos.getY() - SPAWN_RANGE, pos.getZ() - SPAWN_RANGE,
-                pos.getX() + SPAWN_RANGE + 1, pos.getY() + SPAWN_RANGE + 1, pos.getZ() + SPAWN_RANGE + 1
+                pos.getX() - spawnRange, pos.getY() - spawnRange, pos.getZ() - spawnRange,
+                pos.getX() + spawnRange + 1, pos.getY() + spawnRange + 1, pos.getZ() + spawnRange + 1
             );
             long nearbyCount = level.getEntities(entityType, nearbyBox, e -> true).size();
-            if (nearbyCount >= MAX_NEARBY_ENTITIES) {
+            if (nearbyCount >= ConfigSettings.antiPikeMaxNearbyEntities) {
                 canSpawn = false;
             }
         }
@@ -97,10 +94,11 @@ public class AntiPikeBlockEntity extends BlockEntity {
         int spawnCount = getWeightedSpawnCount(random);
         int totalSpawned = 0;
 
+        int spawnRange = ConfigSettings.antiPikeSpawnRange;
         for (int mob = 0; mob < spawnCount; mob++) {
             for (int attempt = 0; attempt < MAX_ATTEMPTS_PER_MOB; attempt++) {
-                double x = pos.getX() + (random.nextDouble() - 0.5) * SPAWN_RANGE * 2 + 0.5;
-                double z = pos.getZ() + (random.nextDouble() - 0.5) * SPAWN_RANGE * 2 + 0.5;
+                double x = pos.getX() + (random.nextDouble() - 0.5) * spawnRange * 2 + 0.5;
+                double z = pos.getZ() + (random.nextDouble() - 0.5) * spawnRange * 2 + 0.5;
                 double y = pos.getY() + random.nextInt(3) - 1;
 
                 BlockPos spawnPos = BlockPos.containing(x, y, z);
@@ -143,10 +141,14 @@ public class AntiPikeBlockEntity extends BlockEntity {
     }
 
     private void resetSpawnDelay(ServerLevel level) {
+        int minDelay = ConfigSettings.antiPikeMinSpawnDelay;
+        int maxDelay = ConfigSettings.antiPikeMaxSpawnDelay;
+        // Guard against a misconfigured range where max <= min
+        int spread = Math.max(1, maxDelay - minDelay);
         //? if mc12011 {
-        spawnDelay = MIN_SPAWN_DELAY + level.random.nextInt(MAX_SPAWN_DELAY - MIN_SPAWN_DELAY);
+        spawnDelay = minDelay + level.random.nextInt(spread);
         //?} else {
-        /*spawnDelay = MIN_SPAWN_DELAY + level.getRandom().nextInt(MAX_SPAWN_DELAY - MIN_SPAWN_DELAY);
+        /*spawnDelay = minDelay + level.getRandom().nextInt(spread);
         *///?}
         setChanged();
     }

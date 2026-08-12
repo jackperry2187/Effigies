@@ -35,10 +35,14 @@ Effigies supports multiple Minecraft versions and mod loaders:
     - When the player looks at an activated Pike, the mob it is currently preventing will hover on top of the Pike
 - Shift+Right-Click an activated Pike to remove the head (the head will drop as an item)
 - Breaking a Pike will drop both the Pike block and the head (if activated)
-- Pikes work in all dimensions (Overworld, Nether, End, and modded dimensions)
+- Pikes work in all dimensions by default (Overworld, Nether, End, and modded dimensions)
+    - Use `dimension_whitelist` in the config to limit Pike spawn prevention to specific dimensions
 - Also adds a new Anti-Spear which has slightly higher damage than Netherite and the same attack speed as Diamond
-- The Anti-Spear can also be used to craft the Anti-Pike which acts as a powerful mob spawner for whatever mob head is placed on it
-- Adds a convenient Grimoire which lists all the crafting recipes, radius of the Pikes, and valid mob heads
+- The Anti-Spear can also be used to craft the Anti-Pike, which acts as a powerful mob spawner for whatever mob head is placed on it
+    - Its spawn delay, activation range, spawn range, and nearby-entity limit can be customized in the config
+- Adds a Grimoire which lists all the crafting recipes, radius of the Pikes, and valid mob heads
+    - By default, each player receives one the first time they join a world
+    - Set `give_grimoire_on_join=false` to disable; the Grimoire remains craftable
 
 ## In-Game Example
 Inactive (left) and Active (right) Diamond Pikes
@@ -94,5 +98,5 @@ And shows you which mob heads prevent which mobs!
 - Each Pike only prevents the spawn of the mob type matching the head placed on it
 - Multiple Pikes with different heads can be used to prevent multiple mob types from spawning within the radius
 - Pikes are efficient even in large numbers - they use an optimized chunk-based lookup system
-- When connecting to a server, the server will send it's config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
+- When connecting to a server, the server will send its config to the player, meaning the tooltips will update accurately and the player's own config file won't be modified or used
 - Supports JEI 27.4.0.15 or Newer!
