@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "effigies-gametest",
+  "version": "1.0.0",
+  "name": "Effigies GameTests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "jackperry2187.effigies.gametest.EffigiesFabricGameTests"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "*",
+    "effigies": "*"
+  }
+}

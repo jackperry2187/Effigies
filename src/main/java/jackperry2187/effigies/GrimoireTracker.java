@@ -1,5 +1,8 @@
 package jackperry2187.effigies;
 
+import jackperry2187.effigies.config.ConfigSettings;
+import jackperry2187.effigies.registry.ModItems;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -7,9 +10,11 @@ import java.util.UUID;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 //? if mc261 {
 /*import net.minecraft.resources.Identifier;
 *///?}
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
@@ -61,6 +66,25 @@ public class GrimoireTracker extends SavedData {
     public void markGrimoireGiven(UUID playerUuid) {
         givenPlayers.add(playerUuid);
         setDirty();
+    }
+
+    public static boolean giveGrimoireIfNeeded(MinecraftServer server, ServerPlayer player) {
+        if (!ConfigSettings.giveGrimoireOnJoin) {
+            return false;
+        }
+
+        GrimoireTracker tracker = get(server);
+        if (tracker.hasReceivedGrimoire(player.getUUID())) {
+            return false;
+        }
+
+        ItemStack grimoire = new ItemStack(ModItems.grimoire());
+        if (!player.getInventory().add(grimoire)) {
+            player.drop(grimoire, false);
+        }
+        tracker.markGrimoireGiven(player.getUUID());
+        Effigies.LOGGER.info("Gave grimoire to player {}", player.getName().getString());
+        return true;
     }
 
     public static GrimoireTracker get(MinecraftServer server) {

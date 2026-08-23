@@ -22,6 +22,7 @@ val javaVersion = if (is261) 25 else 21
 val minecraftVersion = mcVersion
 val modVersion: String by project
 val mavenGroup: String by project
+val gameTestSourceSet = if (isNeoforge) sourceSets.create("gametest") else null
 
 version = "$modVersion-$mcVersion-$loader"
 group = mavenGroup
@@ -44,7 +45,30 @@ loom {
 
     runConfigs.all {
         ideConfigGenerated(true)
-        runDir = "../../run"
+        runDir = if (name.equals("gameTest", ignoreCase = true)) {
+            "../../run/gametest/${stonecutter.current.project}"
+        } else {
+            "../../run"
+        }
+    }
+
+    if (isNeoforge) {
+        runs {
+            create("gameTestServer") {
+                name("Game Test Server")
+                environment("server")
+                forgeTemplate("gameTestServer")
+                source("gametest")
+                mods {
+                    create("effigies") {
+                        sourceSet("main")
+                        sourceSet("gametest")
+                    }
+                }
+                property("neoforge.enabledGameTestNamespaces", "effigies")
+                runDir("../../run/gametest/${stonecutter.current.project}")
+            }
+        }
     }
 }
 
@@ -252,7 +276,33 @@ dependencies {
     }
 }
 
+if (isFabric) {
+    fabricApi {
+        configureTests {
+            createSourceSet = true
+            modId = "effigies-gametest"
+            enableGameTests = true
+            enableClientGameTests = false
+            eula = true
+        }
+    }
+    loom {
+        runConfigs.named("gameTest") {
+            runDir = "../../run/gametest/${stonecutter.current.project}"
+        }
+    }
+    sourceSets["gametest"].java.exclude("**/neoforge12111/**", "**/neoforge261/**")
+}
+
 if (isNeoforge) {
+    gameTestSourceSet!!.java.exclude("**/EffigiesFabricGameTests.java")
+    if (is261) {
+        gameTestSourceSet.java.exclude("**/neoforge12111/**")
+    } else {
+        gameTestSourceSet.java.exclude("**/neoforge261/**")
+    }
+    gameTestSourceSet.resources.exclude("fabric.mod.json")
+
     dependencies {
         add("neoForge", "net.neoforged:neoforge:$neoforgeVersion")
     }
@@ -266,6 +316,49 @@ java {
     withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
+}
+
+if (isNeoforge) {
+    val mainSourceSet = sourceSets.main.get()
+    val testSourceSet = gameTestSourceSet!!
+
+    configurations[testSourceSet.implementationConfigurationName]
+        .extendsFrom(configurations["implementation"])
+    configurations[testSourceSet.runtimeOnlyConfigurationName]
+        .extendsFrom(configurations["runtimeOnly"])
+
+    testSourceSet.compileClasspath += mainSourceSet.output + configurations["compileClasspath"]
+    testSourceSet.runtimeClasspath += testSourceSet.output + mainSourceSet.output + configurations["runtimeClasspath"]
+
+    tasks.named<JavaCompile>(testSourceSet.compileJavaTaskName) {
+        options.encoding = "UTF-8"
+        options.release.set(javaVersion)
+    }
+}
+
+val gameTestTaskName = if (isFabric) "runGameTest" else "runGameTestServer"
+tasks.register("runEffigiesGameTests") {
+    group = "verification"
+    description = "Runs the Effigies GameTests for ${stonecutter.current.project}."
+    dependsOn(gameTestTaskName)
+}
+
+val targetOrder = stonecutter.tree.nodes.map { it.metadata.project }
+val currentTargetIndex = targetOrder.indexOf(stonecutter.current.project)
+if (currentTargetIndex > 0) {
+    val previousTarget = targetOrder[currentTargetIndex - 1]
+    tasks.named("build") {
+        mustRunAfter(":$previousTarget:build")
+    }
+    tasks.named("runEffigiesGameTests") {
+        mustRunAfter(":$previousTarget:runEffigiesGameTests")
+    }
+}
+
+if (isNeoforge) {
+    tasks.named("build") {
+        dependsOn("runGameTestServer")
     }
 }
 
@@ -292,12 +385,17 @@ tasks.processResources {
         "java_version" to javaVersion,
         "loader" to loader,
         "neoforge_version_range" to neoforgeVersionRange,
-        "access_widener_entry" to if (isFabric) """"accessWidener": "effigies.accesswidener",""" else ""
+        "access_widener_entry" to when {
+            isFabric -> """"accessWidener": "effigies.accesswidener","""
+            else -> ""
+        }
     )
 
     inputs.properties(props)
 
-    exclude("effigies.classtweaker")
+    if (!is261) {
+        exclude("effigies.classtweaker")
+    }
     if (isNeoforge) {
         exclude("effigies.accesswidener")
     }
@@ -314,6 +412,31 @@ tasks.jar {
 }
 
 if (is261 && isFabric) {
+    val restoreFabricGameTestMetadata = tasks.register("restoreFabricGameTestMetadata") {
+        doLast {
+            val metadata = file("build/resources/main/fabric.mod.json")
+            if (metadata.exists()) {
+                metadata.writeText(metadata.readText().replace(
+                    "\"accessWidener\": \"effigies.classtweaker\"",
+                    "\"accessWidener\": \"effigies.accesswidener\""
+                ))
+            }
+        }
+    }
+
+    tasks.named("runGameTest") {
+        doFirst {
+            val metadata = file("build/resources/main/fabric.mod.json")
+            if (metadata.exists()) {
+                metadata.writeText(metadata.readText().replace(
+                    "\"accessWidener\": \"effigies.accesswidener\"",
+                    "\"accessWidener\": \"effigies.classtweaker\""
+                ))
+            }
+        }
+        finalizedBy(restoreFabricGameTestMetadata)
+    }
+
     tasks.named("remapJar") {
         doLast {
             val jar = outputs.files.singleFile

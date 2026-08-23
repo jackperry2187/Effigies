@@ -174,6 +174,11 @@ public final class PikeRegistry {
      * Called when a chunk is loaded.
      */
     public static void onChunkLoad(ServerLevel level, LevelChunk chunk) {
+        //? if mc12011 {
+        onChunkUnload(level, chunk.getPos().x, chunk.getPos().z);
+        //?} else {
+        /*onChunkUnload(level, chunk.getPos().x(), chunk.getPos().z());
+        *///?}
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
             if (!(blockEntity instanceof PikeBlockEntity)) {
                 continue;

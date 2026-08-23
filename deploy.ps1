@@ -30,13 +30,15 @@ $Targets = @(
 )
 
 if (-not $SkipBuild) {
-    Write-Host "`n=== Building Effigies ===" -ForegroundColor Cyan
-    & "$ProjectRoot\gradlew.bat" chiseledBuild --no-daemon
+    Write-Host "`n=== Building and testing Effigies ===" -ForegroundColor Cyan
+    & "$ProjectRoot\run-tests.ps1"
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Build failed!" -ForegroundColor Red
-        exit 1
+        Write-Host "Build or GameTests failed; deployment was not started." -ForegroundColor Red
+        exit $LASTEXITCODE
     }
-    Write-Host "Build succeeded." -ForegroundColor Green
+    Write-Host "Build and GameTests succeeded." -ForegroundColor Green
+} else {
+    Write-Host "`n=== Deploying existing jars without rebuilding or testing ===" -ForegroundColor Yellow
 }
 
 function Deploy-Jar {

@@ -29,3 +29,11 @@ tasks.register("chiseledBuild") {
         dependsOn(":${node.metadata.project}:build")
     }
 }
+
+tasks.register("runAllGameTests") {
+    group = "verification"
+    description = "Runs the Effigies GameTests for all supported targets."
+    for (node in stonecutter.tree.nodes) {
+        dependsOn(":${node.metadata.project}:runEffigiesGameTests")
+    }
+}

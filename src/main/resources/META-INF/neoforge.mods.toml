@@ -13,6 +13,9 @@ A Minecraft mod that adds powerful mob spawning prevention options to the game.
 '''
 logoFile = "assets/effigies/icon.png"
 
+[[mixins]]
+config = "effigies.mixins.json"
+
 [[dependencies.effigies]]
 modId = "neoforge"
 type = "required"
