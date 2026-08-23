@@ -99,23 +99,17 @@ public final class EffigiesFabricGameTests implements CustomTestMethodInvoker {
             try {
                 level.addFreshEntity(matching);
                 level.addFreshEntity(allowed);
+                helper.assertTrue(matching.isRemoved(),
+                    "Fabric entity-load handling should remove a matching mob");
+                helper.assertTrue(!allowed.isRemoved(),
+                    "Fabric entity-load handling should allow a nonmatching mob");
             } finally {
+                matching.discard();
+                allowed.discard();
                 PikeRegistry.unregisterPike(level, pikePos);
             }
-            helper.runAfterDelay(1, () -> {
-                try {
-                    helper.assertTrue(level.getEntity(matching.getUUID()) == null,
-                        "Fabric entity-load handling should remove a matching mob");
-                    helper.assertTrue(level.getEntity(allowed.getUUID()) == allowed,
-                        "Fabric entity-load handling should allow a nonmatching mob");
-                } finally {
-                    matching.discard();
-                    allowed.discard();
-                }
-                helper.succeed();
-            });
-            return;
         }
+        helper.succeed();
     }
 
     @GameTest(environment = "effigies:isolated/dimension_whitelist_accepts_only_configured_dimension", structure = "fabric-gametest-api-v1:empty", maxTicks = 80)
